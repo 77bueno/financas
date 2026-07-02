@@ -17,10 +17,12 @@ export function TabBar() {
   return (
     <div
       style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, zIndex: 10,
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: 'calc(80px + env(safe-area-inset-bottom))', zIndex: 10,
         background: 'rgba(12,10,24,.72)', backdropFilter: 'blur(16px)',
         borderTop: '1px solid rgba(255,255,255,.07)',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around', paddingTop: 13,
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around',
+        paddingTop: 13, paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       <button onClick={actions.goHome} style={{ ...btnStyle, color: c('home') }}>

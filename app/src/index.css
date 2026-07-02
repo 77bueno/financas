@@ -17,6 +17,34 @@ body {
 .fin-scroll::-webkit-scrollbar { width: 0; height: 0; }
 .fin-scroll { scrollbar-width: none; }
 
+.app-card {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(120% 55% at 82% 0%, #241a4d 0%, #0C0A18 55%);
+  font-family: 'Sora', sans-serif;
+}
+
+.app-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: calc(24px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+}
+
+@media (min-width: 640px) {
+  .app-card {
+    min-height: calc(100vh - 48px);
+    min-height: calc(100dvh - 48px);
+    margin: 24px 0;
+    border-radius: 32px;
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.06);
+  }
+}
+
 @keyframes floatUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

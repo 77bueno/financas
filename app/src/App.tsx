@@ -32,30 +32,14 @@ function AppShell() {
   return (
     <div
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background: 'radial-gradient(130% 80% at 50% -10%, #1b1436 0%, #0a0814 60%)',
         display: 'flex',
         justifyContent: 'center',
       }}
     >
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 480,
-          minHeight: '100vh',
-          background: 'radial-gradient(120% 55% at 82% 0%, #241a4d 0%, #0C0A18 55%)',
-          fontFamily: "'Sora', sans-serif",
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          className="fin-scroll"
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            overflowY: 'auto', padding: '24px 20px 96px',
-          }}
-        >
+      <div className="app-card">
+        <div className="fin-scroll app-scroll">
           <Screen />
         </div>
 

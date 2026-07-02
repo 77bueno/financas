@@ -27,7 +27,7 @@ export function AddTransactionSheet() {
         style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, background: '#15112b',
           borderRadius: '28px 28px 41px 41px', borderTop: '1px solid rgba(255,255,255,.1)',
-          padding: '12px 22px 30px', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
+          padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
         }}
       >
         <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,.2)', borderRadius: 99, margin: '0 auto 16px' }} />
