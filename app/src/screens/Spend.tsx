@@ -1,70 +1,69 @@
-interface SpendRow {
-  icon: string;
-  iconBg: string;
-  name: string;
-  pctLabel: string;
-  amount: string;
-  change?: { text: string; color: string };
-}
-
-const ROWS: SpendRow[] = [
-  { icon: '🏠', iconBg: 'rgba(255,143,179,.16)', name: 'Moradia', pctLabel: '35% dos gastos', amount: 'R$ 1.100', change: { text: 'igual', color: '#7C7896' } },
-  { icon: '🍽️', iconBg: 'rgba(232,185,106,.16)', name: 'Alimentação', pctLabel: '26% dos gastos', amount: 'R$ 820', change: { text: '↓ R$ 90', color: '#6EE7B0' } },
-  { icon: '💸', iconBg: 'rgba(255,143,179,.10)', name: 'Outros', pctLabel: '11% dos gastos', amount: 'R$ 400' },
-  { icon: '🚗', iconBg: 'rgba(142,123,255,.16)', name: 'Transporte', pctLabel: '10% dos gastos', amount: 'R$ 310', change: { text: '↑ R$ 40', color: '#FF8FB3' } },
-  { icon: '💊', iconBg: 'rgba(110,231,176,.16)', name: 'Saúde', pctLabel: '8% dos gastos', amount: 'R$ 240' },
-  { icon: '🎬', iconBg: 'rgba(185,166,255,.16)', name: 'Lazer', pctLabel: '6% dos gastos', amount: 'R$ 180' },
-  { icon: '📺', iconBg: 'rgba(255,110,156,.16)', name: 'Assinaturas', pctLabel: '4% dos gastos', amount: 'R$ 130' },
-];
+import { useFinance } from '../state/store';
+import { MONTHS_PT } from '../state/constants';
 
 export function Spend() {
+  const { actions, derived } = useFinance();
+  const now = new Date();
+  const title = `${MONTHS_PT[now.getMonth()]} ${now.getFullYear()}`;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn .3s both' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em' }}>ONDE GASTEI</span>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <strong style={{ fontSize: 22, color: '#F3F1FF', fontWeight: 700 }}>Junho 2026</strong>
-          <span style={{ fontSize: 12.5, color: '#6EE7B0' }}>↓ 12% vs. maio</span>
-        </div>
+        <strong style={{ fontSize: 22, color: '#F3F1FF', fontWeight: 700 }}>{title}</strong>
       </div>
 
-      <div className="screen-cols">
-      <div className="screen-col">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0' }}>
-        <div
-          style={{
-            position: 'relative', width: 190, height: 190, borderRadius: '50%',
-            background: 'conic-gradient(#FF8FB3 0 35%, #E8B96A 35% 61%, #8E7BFF 61% 71%, #6EE7B0 71% 79%, #B9A6FF 79% 85%, #FF6E9C 85% 89%, #5E4BA0 89% 100%)',
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 26, borderRadius: '50%', background: '#0e0b1c', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 11, color: '#9C97B8' }}>Total gasto</span>
-            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 24, fontWeight: 600, color: '#fff' }}>R$ 3.180</span>
-            <span style={{ fontSize: 11, color: '#7C7896' }}>de R$ 3.600 previsto</span>
-          </div>
-        </div>
-      </div>
-
-      </div>
-
-      <div className="screen-col">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {ROWS.map(r => (
-          <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 11, background: 'rgba(255,255,255,.04)', borderRadius: 16 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 11, background: r.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{r.icon}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13.5, color: '#F3F1FF', fontWeight: 500 }}>{r.name}</div>
-              <div style={{ fontSize: 11, color: '#7C7896' }}>{r.pctLabel}</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontFamily: "'Space Grotesk'", fontSize: 14, color: '#fff', fontWeight: 600 }}>{r.amount}</div>
-              {r.change && <div style={{ fontSize: 11, color: r.change.color }}>{r.change.text}</div>}
+      {derived.totalSpend > 0 ? (
+        <div className="screen-cols">
+        <div className="screen-col">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0' }}>
+          <div
+            style={{
+              position: 'relative', width: 190, height: 190, borderRadius: '50%',
+              background: derived.donutBg,
+            }}
+          >
+            <div style={{ position: 'absolute', inset: 26, borderRadius: '50%', background: '#0e0b1c', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 11, color: '#9C97B8' }}>Total gasto</span>
+              <span style={{ fontFamily: "'Space Grotesk'", fontSize: 24, fontWeight: 600, color: '#fff' }}>{derived.totalSpendStr}</span>
+              <span style={{ fontSize: 11, color: '#7C7896' }}>{derived.spendCats.length} categoria{derived.spendCats.length === 1 ? '' : 's'}</span>
             </div>
           </div>
-        ))}
-      </div>
-      </div>
-      </div>
+        </div>
+        </div>
+
+        <div className="screen-col">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {derived.spendCats.map(c => (
+            <div key={c.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 11, background: 'rgba(255,255,255,.04)', borderRadius: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 11, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>{c.icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13.5, color: '#F3F1FF', fontWeight: 500 }}>{c.name}</div>
+                <div style={{ fontSize: 11, color: '#7C7896' }}>{c.pct}% dos gastos</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: "'Space Grotesk'", fontSize: 14, color: '#fff', fontWeight: 600 }}>{c.totalStr}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '40px 20px', textAlign: 'center' }}>
+          <div style={{ width: 70, height: 70, borderRadius: 22, background: 'rgba(255,143,179,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>🧾</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <strong style={{ fontSize: 16, color: '#F3F1FF' }}>Nenhum gasto registrado</strong>
+            <span style={{ fontSize: 13, color: '#9C97B8', lineHeight: 1.5 }}>Registre seus gastos e este relatório mostra pra onde seu dinheiro está indo, por categoria.</span>
+          </div>
+          <button
+            onClick={actions.openAdd}
+            style={{ padding: '13px 22px', background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)', border: 'none', borderRadius: 14, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'" }}
+          >
+            + Registrar um gasto
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,19 +11,40 @@ export function createInitialState(): AppState {
     quickKind: null,
     quickName: '',
     quickCents: 0,
+    quickGroup: 'disp',
     hidden: false,
     addOpen: false,
     addType: 'despesa',
     addCat: 'Alimentação',
     cents: 0,
     toast: false,
+    toastMsg: '',
+    userName: '',
+    salary: 0,
+    cardBill: 0,
+    debts: [],
+    investPct: 30,
+    accounts: [],
+    investments: [],
+    goals: [],
+    yearData: [],
+    txns: [],
+  };
+}
+
+/** Demo dataset ("Larissa") so people can explore the platform filled in. */
+export function createDemoState(): AppState {
+  return {
+    ...createInitialState(),
+    screen: 'home',
+    userName: 'Larissa',
     salary: 5600,
+    cardBill: 1180,
     debts: [
       { id: nextId('debt'), name: 'Aluguel', value: 1100 },
       { id: nextId('debt'), name: 'Cartão de crédito', value: 480 },
       { id: nextId('debt'), name: 'Financiamento do carro', value: 350 },
     ],
-    investPct: 30,
     accounts: [
       { id: nextId('acc'), icon: '🏦', name: 'Conta corrente', bank: 'Banco Roxo', value: 3740.20, group: 'disp' },
       { id: nextId('acc'), icon: '💵', name: 'Carteira', bank: 'Dinheiro em espécie', value: 240, group: 'disp' },
@@ -42,15 +63,17 @@ export function createInitialState(): AppState {
       { id: nextId('goal'), icon: '📱', name: 'Trocar celular', sub: 'Setembro 2026', saved: 900, target: 2500, color: '#E8B96A' },
     ],
     yearData: [
-      { m: 'Jan', v: 38200 }, { m: 'Fev', v: 39800 }, { m: 'Mar', v: 41100 },
-      { m: 'Abr', v: 43050 }, { m: 'Mai', v: 46410 }, { m: 'Jun', v: 47890 },
+      { key: '2026-01', m: 'Jan', v: 38200 }, { key: '2026-02', m: 'Fev', v: 39800 },
+      { key: '2026-03', m: 'Mar', v: 41100 }, { key: '2026-04', m: 'Abr', v: 43050 },
+      { key: '2026-05', m: 'Mai', v: 46410 }, { key: '2026-06', m: 'Jun', v: 47890 },
     ],
     txns: [
       { id: nextId('txn'), icon: '💰', name: 'Salário', sub: 'Hoje · Conta corrente', amount: 5600 },
-      { id: nextId('txn'), icon: '🛒', name: 'Mercado Extra', sub: 'Ontem · Cartão', amount: -238.90 },
-      { id: nextId('txn'), icon: '🍔', name: 'iFood', sub: 'Ontem · Cartão', amount: -52.40 },
-      { id: nextId('txn'), icon: '🚗', name: 'Uber', sub: '28 jun · Cartão', amount: -19.80 },
-      { id: nextId('txn'), icon: '🎬', name: 'Netflix', sub: '27 jun · Assinatura', amount: -55.90 },
+      { id: nextId('txn'), icon: '🛒', name: 'Alimentação', sub: 'Ontem · Mercado', amount: -238.90 },
+      { id: nextId('txn'), icon: '🍔', name: 'Alimentação', sub: 'Ontem · iFood', amount: -52.40 },
+      { id: nextId('txn'), icon: '🚗', name: 'Transporte', sub: '28 jun · Uber', amount: -19.80 },
+      { id: nextId('txn'), icon: '📺', name: 'Assinaturas', sub: '27 jun · Netflix', amount: -55.90 },
+      { id: nextId('txn'), icon: '🏠', name: 'Moradia', sub: '25 jun · Aluguel', amount: -1100 },
     ],
   };
 }

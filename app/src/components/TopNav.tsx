@@ -14,6 +14,7 @@ export function TopNav() {
   const { state, actions } = useFinance();
   if (state.screen === 'onboard') return null;
   const c = (s: string) => (state.screen === s ? ACTIVE : INACTIVE);
+  const initial = (state.userName.trim()[0] || '•').toUpperCase();
 
   return (
     <header className="topnav">
@@ -54,6 +55,20 @@ export function TopNav() {
         }}
       >
         <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>Adicionar
+      </button>
+
+      <button
+        onClick={actions.goProfile}
+        title="Meu perfil"
+        style={{
+          marginLeft: 12,
+          width: 40, height: 40, borderRadius: 13, background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700,
+          fontFamily: "'Space Grotesk'", fontSize: 15, border: state.screen === 'profile' ? '2px solid #B9A6FF' : 'none',
+          cursor: 'pointer', boxShadow: '0 0 16px rgba(142,123,255,.4)',
+        }}
+      >
+        {initial}
       </button>
     </header>
   );

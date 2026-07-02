@@ -33,6 +33,31 @@ export function QuickAddSheet() {
           </button>
         </div>
 
+        {state.quickKind === 'conta' && (
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: 4, gap: 4, marginBottom: 14 }}>
+            <button
+              onClick={() => actions.setQuickGroup('disp')}
+              style={{
+                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
+                background: state.quickGroup === 'disp' ? '#8E7BFF' : 'transparent',
+                color: state.quickGroup === 'disp' ? '#fff' : '#9C97B8',
+              }}
+            >
+              💳 Disponível
+            </button>
+            <button
+              onClick={() => actions.setQuickGroup('reserva')}
+              style={{
+                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
+                background: state.quickGroup === 'reserva' ? '#6EE7B0' : 'transparent',
+                color: state.quickGroup === 'reserva' ? '#08321f' : '#9C97B8',
+              }}
+            >
+              🐷 Guardado
+            </button>
+          </div>
+        )}
+
         <input
           value={state.quickName}
           onChange={e => actions.setQuickName(e.target.value)}

@@ -7,6 +7,7 @@ import { Goals } from './screens/Goals';
 import { Wealth } from './screens/Wealth';
 import { Plan } from './screens/Plan';
 import { Year } from './screens/Year';
+import { Profile } from './screens/Profile';
 import { AddTransactionSheet } from './components/AddTransactionSheet';
 import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
@@ -25,6 +26,7 @@ function Screen() {
     case 'wealth': return <Wealth />;
     case 'plan': return <Plan />;
     case 'year': return <Year />;
+    case 'profile': return <Profile />;
     default: return null;
   }
 }
@@ -52,7 +54,7 @@ function AppShell() {
 
 function ToastGate() {
   const { state } = useFinance();
-  return <Toast show={state.toast} />;
+  return <Toast show={state.toast} msg={state.toastMsg} />;
 }
 
 function App() {

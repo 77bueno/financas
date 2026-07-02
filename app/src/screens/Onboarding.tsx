@@ -15,6 +15,10 @@ const rowInputStyle: React.CSSProperties = {
   borderRadius: 14, padding: '8px 12px',
 };
 
+function StepTag({ n }: { n: number }) {
+  return <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: '#8E7BFF', fontWeight: 600 }}>PASSO {n} DE 3</span>;
+}
+
 export function Onboarding() {
   const { state, actions } = useFinance();
 
@@ -36,29 +40,29 @@ export function Onboarding() {
               Todo o seu dinheiro,<br />num lugar só.
             </h1>
             <p style={{ margin: 0, fontSize: 14.5, color: '#9C97B8', lineHeight: 1.55 }}>
-              Contas, investimentos, gastos e metas juntos. Vamos começar preenchendo o básico — leva 1 minuto.
+              Contas, investimentos, gastos e metas juntos. Comece do zero com os seus números — leva 1 minuto.
             </p>
           </div>
           <div style={{ flex: 1 }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button
-              onClick={actions.connectBank}
+              onClick={actions.startManual}
               style={{
                 width: '100%', padding: 16, background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)', border: 'none',
                 borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
                 boxShadow: '0 12px 26px -8px rgba(142,123,255,.7)',
               }}
             >
-              🔗 Conectar meu banco
+              ✍️ Começar do zero
             </button>
             <button
-              onClick={actions.startManual}
+              onClick={actions.loadDemo}
               style={{
                 width: '100%', padding: 16, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)',
                 borderRadius: 16, color: '#F3F1FF', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
               }}
             >
-              ✍️ Adicionar manualmente
+              🔎 Explorar com dados de exemplo
             </button>
             <button
               onClick={actions.finishOnb}
@@ -74,11 +78,37 @@ export function Onboarding() {
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 18, paddingTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button onClick={actions.onbBack} style={backBtnStyle}>‹</button>
-            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: '#8E7BFF', fontWeight: 600 }}>PASSO 1 DE 2</span>
+            <StepTag n={1} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#fff' }}>Como podemos te chamar?</h2>
+            <p style={{ margin: 0, fontSize: 13.5, color: '#9C97B8' }}>Só pra personalizar o seu painel.</p>
+          </div>
+          <input
+            value={state.userName}
+            onChange={e => actions.setUserName(e.target.value)}
+            placeholder="Seu nome"
+            autoFocus
+            style={{
+              width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)',
+              borderRadius: 16, padding: '16px 18px', color: '#fff', fontFamily: "'Sora'", fontSize: 17,
+              outline: 'none',
+            }}
+          />
+          <div style={{ flex: 1 }} />
+          <button onClick={actions.onbNext} style={primaryBtnStyle}>Continuar</button>
+        </div>
+      )}
+
+      {state.onbStep === 2 && (
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 18, paddingTop: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button onClick={actions.onbBack} style={backBtnStyle}>‹</button>
+            <StepTag n={2} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#fff' }}>Onde você guarda dinheiro?</h2>
-            <p style={{ margin: 0, fontSize: 13.5, color: '#9C97B8' }}>Adicione suas contas e o saldo atual de cada uma.</p>
+            <p style={{ margin: 0, fontSize: 13.5, color: '#9C97B8' }}>Adicione suas contas e o saldo atual de cada uma. Você pode editar tudo depois.</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {state.accounts.map(a => (
@@ -114,11 +144,11 @@ export function Onboarding() {
         </div>
       )}
 
-      {state.onbStep === 2 && (
+      {state.onbStep === 3 && (
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 18, paddingTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button onClick={actions.onbBack} style={backBtnStyle}>‹</button>
-            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: '#8E7BFF', fontWeight: 600 }}>PASSO 2 DE 2</span>
+            <StepTag n={3} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#fff' }}>Quanto você recebe por mês?</h2>
@@ -128,9 +158,10 @@ export function Onboarding() {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontFamily: "'Space Grotesk'", fontSize: 22, color: '#6EE7B0', fontWeight: 500 }}>R$</span>
               <input
-                value={String(state.salary)}
+                value={state.salary ? String(state.salary) : ''}
                 onChange={e => actions.setSalary(e.target.value)}
                 inputMode="numeric"
+                placeholder="0"
                 style={{
                   flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#fff',
                   fontFamily: "'Space Grotesk'", fontSize: 38, fontWeight: 600, width: '100%', letterSpacing: '-.02em',
@@ -144,7 +175,7 @@ export function Onboarding() {
         </div>
       )}
 
-      {state.onbStep === 3 && (
+      {state.onbStep === 4 && (
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'center', justifyContent: 'center', gap: 20, textAlign: 'center', padding: '40px 10px' }}>
           <div
             style={{
@@ -155,9 +186,9 @@ export function Onboarding() {
             ✓
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#fff' }}>Tudo pronto!</h2>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#fff' }}>Tudo pronto{state.userName.trim() ? `, ${state.userName.trim()}` : ''}!</h2>
             <p style={{ margin: 0, fontSize: 14, color: '#9C97B8', lineHeight: 1.55 }}>
-              Seu painel já está montado com o que você adicionou. Você pode editar tudo depois pelo botão <strong style={{ color: '#B9A6FF' }}>+</strong>.
+              Seu painel está montado com o que você adicionou. Registre gastos, investimentos e metas pelo botão <strong style={{ color: '#B9A6FF' }}>+</strong>.
             </p>
           </div>
           <button
@@ -182,7 +213,7 @@ export function Onboarding() {
           }}
         >
           <div style={{ width: 54, height: 54, borderRadius: '50%', border: '3px solid rgba(142,123,255,.25)', borderTopColor: '#8E7BFF', animation: 'spin 1s linear infinite' }} />
-          <span style={{ fontSize: 14, color: '#C9C5DE' }}>Conectando com seu banco…</span>
+          <span style={{ fontSize: 14, color: '#C9C5DE' }}>Preparando dados de exemplo…</span>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-export type Screen = 'onboard' | 'home' | 'spend' | 'invest' | 'goals' | 'wealth' | 'plan' | 'year';
+export type Screen = 'onboard' | 'home' | 'spend' | 'invest' | 'goals' | 'wealth' | 'plan' | 'year' | 'profile';
 
 export type AccountGroup = 'disp' | 'reserva';
 
@@ -38,6 +38,7 @@ export interface Debt {
 }
 
 export interface YearPoint {
+  key: string;
   m: string;
   v: number;
 }
@@ -62,13 +63,17 @@ export interface AppState {
   quickKind: QuickKind;
   quickName: string;
   quickCents: number;
+  quickGroup: AccountGroup;
   hidden: boolean;
   addOpen: boolean;
   addType: TxnType;
   addCat: string;
   cents: number;
   toast: boolean;
+  toastMsg: string;
+  userName: string;
   salary: number;
+  cardBill: number;
   debts: Debt[];
   investPct: number;
   accounts: Account[];
