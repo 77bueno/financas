@@ -19,7 +19,7 @@ export function Goals() {
         <span style={{ fontSize: 12, color: '#6EE7B0' }}>↑ +18%</span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="grid-2">
         {derived.goalRows.map(g => (
           <div key={g.id} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 20, padding: 18, display: 'flex', flexDirection: 'column', gap: 13 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

@@ -13,6 +13,8 @@ export function Year() {
         </div>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       {/* evolução patrimônio */}
       <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 22, padding: '20px 18px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -32,6 +34,9 @@ export function Year() {
         </div>
       </div>
 
+      </div>
+
+      <div className="screen-col">
       {/* destaques do ano */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <strong style={{ fontSize: 15, color: '#F3F1FF', fontWeight: 600 }}>Destaques</strong>
@@ -78,6 +83,8 @@ export function Year() {
             <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13.5, color: '#6EE7B0', fontWeight: 600 }}>-8%</span>
           </div>
         </div>
+      </div>
+      </div>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export function Onboarding() {
   const { state, actions } = useFinance();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 680, animation: 'fadeIn .3s both' }}>
+    <div className="onboard-wrap" style={{ display: 'flex', flexDirection: 'column', minHeight: 680, animation: 'fadeIn .3s both' }}>
       {state.onbStep === 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 22, paddingTop: 30 }}>
           <div

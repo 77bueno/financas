@@ -34,6 +34,8 @@ export function Home() {
         </div>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       {/* patrimonio hero */}
       <div
         style={{
@@ -133,6 +135,9 @@ export function Home() {
         </div>
       </div>
 
+      </div>
+
+      <div className="screen-col">
       {/* insight */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: 'rgba(110,231,176,.09)', border: '1px solid rgba(110,231,176,.2)', borderRadius: 18, padding: 15 }}>
         <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(110,231,176,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>💡</div>
@@ -187,6 +192,8 @@ export function Home() {
             <span style={{ fontFamily: "'Space Grotesk'", fontSize: 14, fontWeight: 600, color: t.color }}>{t.amountStr}</span>
           </div>
         ))}
+      </div>
+      </div>
       </div>
     </div>
   );

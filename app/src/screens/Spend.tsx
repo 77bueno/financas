@@ -28,6 +28,8 @@ export function Spend() {
         </div>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0' }}>
         <div
           style={{
@@ -43,6 +45,9 @@ export function Spend() {
         </div>
       </div>
 
+      </div>
+
+      <div className="screen-col">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {ROWS.map(r => (
           <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 11, background: 'rgba(255,255,255,.04)', borderRadius: 16 }}>
@@ -57,6 +62,8 @@ export function Spend() {
             </div>
           </div>
         ))}
+      </div>
+      </div>
       </div>
     </div>
   );

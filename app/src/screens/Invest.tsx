@@ -10,6 +10,8 @@ export function Invest() {
         <strong style={{ fontSize: 22, color: '#F3F1FF', fontWeight: 700 }}>Meus investimentos</strong>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       <div
         style={{
           position: 'relative', background: 'linear-gradient(150deg, rgba(232,185,106,.18), rgba(142,123,255,.10))',
@@ -25,6 +27,9 @@ export function Invest() {
         </div>
       </div>
 
+      </div>
+
+      <div className="screen-col">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <strong style={{ fontSize: 14.5, color: '#F3F1FF', fontWeight: 600 }}>Carteira</strong>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -44,6 +49,8 @@ export function Invest() {
             </div>
           ))}
         </div>
+      </div>
+      </div>
       </div>
     </div>
   );

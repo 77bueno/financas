@@ -13,6 +13,8 @@ export function Wealth() {
         </div>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 22, padding: 20, textAlign: 'center' }}>
         <span style={{ fontSize: 12.5, color: '#9C97B8' }}>Patrimônio líquido</span>
         <div style={{ fontFamily: "'Space Grotesk'", fontSize: 30, fontWeight: 600, color: '#fff', marginTop: 4 }}>{derived.netWorthStr}</div>
@@ -33,6 +35,9 @@ export function Wealth() {
         ))}
       </div>
 
+      </div>
+
+      <div className="screen-col">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em' }}>GUARDADO</span>
         {derived.accReserva.map(a => (
@@ -68,6 +73,8 @@ export function Wealth() {
           </div>
           <span style={{ fontFamily: "'Space Grotesk'", fontSize: 15, color: '#FF8FB3', fontWeight: 600 }}>- {derived.cardBillStr}</span>
         </div>
+      </div>
+      </div>
       </div>
     </div>
   );

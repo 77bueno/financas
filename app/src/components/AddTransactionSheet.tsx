@@ -24,6 +24,7 @@ export function AddTransactionSheet() {
         style={{ position: 'absolute', inset: 0, background: 'rgba(4,2,12,.6)', backdropFilter: 'blur(2px)', animation: 'fadeIn .2s both' }}
       />
       <div
+        className="sheet"
         style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, background: '#15112b',
           borderRadius: '28px 28px 41px 41px', borderTop: '1px solid rgba(255,255,255,.1)',

@@ -13,6 +13,8 @@ export function Plan() {
         </div>
       </div>
 
+      <div className="screen-cols">
+      <div className="screen-col">
       {/* salário input */}
       <div style={{ background: 'linear-gradient(150deg, rgba(110,231,176,.16), rgba(142,123,255,.08))', border: '1px solid rgba(255,255,255,.1)', borderRadius: 22, padding: 20 }}>
         <span style={{ fontSize: 12.5, color: 'rgba(255,255,255,.7)' }}>Quanto você recebe por mês?</span>
@@ -97,6 +99,9 @@ export function Plan() {
         </div>
       </div>
 
+      </div>
+
+      <div className="screen-col">
       {/* slider investir */}
       <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 20, padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -139,6 +144,8 @@ export function Plan() {
         >
           Investir esse valor
         </button>
+      </div>
+      </div>
       </div>
     </div>
   );
