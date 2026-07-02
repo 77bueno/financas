@@ -17,6 +17,13 @@ body {
 .fin-scroll::-webkit-scrollbar { width: 0; height: 0; }
 .fin-scroll { scrollbar-width: none; }
 
+.app-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 480px;
+}
+
 .app-card {
   width: 100%;
   max-width: 480px;
@@ -26,6 +33,7 @@ body {
   overflow: hidden;
   background: radial-gradient(120% 55% at 82% 0%, #241a4d 0%, #0C0A18 55%);
   font-family: 'Sora', sans-serif;
+  flex: 1;
 }
 
 .app-scroll {
@@ -35,13 +43,39 @@ body {
   padding: calc(24px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
 }
 
+.sidenav {
+  display: none;
+}
+
 @media (min-width: 640px) {
-  .app-card {
+  .app-layout {
+    max-width: 576px;
     min-height: calc(100vh - 48px);
     min-height: calc(100dvh - 48px);
     margin: 24px 0;
     border-radius: 32px;
+    overflow: hidden;
     box-shadow: 0 40px 90px -30px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.06);
+  }
+
+  .app-scroll {
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
+  }
+
+  .sidenav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 96px;
+    flex-shrink: 0;
+    padding: 22px 0;
+    background: rgba(12,10,24,.85);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid rgba(255,255,255,.07);
+  }
+
+  .tabbar {
+    display: none !important;
   }
 }
 

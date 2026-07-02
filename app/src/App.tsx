@@ -12,6 +12,7 @@ import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
 import { Toast } from './components/Toast';
 import { TabBar } from './components/TabBar';
+import { SideNav } from './components/SideNav';
 
 function Screen() {
   const { state } = useFinance();
@@ -38,16 +39,19 @@ function AppShell() {
         justifyContent: 'center',
       }}
     >
-      <div className="app-card">
-        <div className="fin-scroll app-scroll">
-          <Screen />
-        </div>
+      <div className="app-layout">
+        <SideNav />
+        <div className="app-card">
+          <div className="fin-scroll app-scroll">
+            <Screen />
+          </div>
 
-        <AddTransactionSheet />
-        <ToastGate />
-        <Hub />
-        <QuickAddSheet />
-        <TabBar />
+          <AddTransactionSheet />
+          <ToastGate />
+          <Hub />
+          <QuickAddSheet />
+          <TabBar />
+        </div>
       </div>
     </div>
   );

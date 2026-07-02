@@ -16,6 +16,7 @@ export function TabBar() {
 
   return (
     <div
+      className="tabbar"
       style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
         height: 'calc(80px + env(safe-area-inset-bottom))', zIndex: 10,
