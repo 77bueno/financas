@@ -36,19 +36,23 @@ export function Invest() {
         {n > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {derived.investRows.map(iv => (
-              <div key={iv.id} style={{ background: 'rgba(255,255,255,.04)', borderRadius: 16, padding: 14, display: 'flex', flexDirection: 'column', gap: 9 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <button
+                key={iv.id}
+                onClick={() => actions.openEditItem('investimento', iv.id)}
+                style={{ background: 'rgba(255,255,255,.04)', border: 'none', borderRadius: 16, padding: 14, display: 'flex', flexDirection: 'column', gap: 9, cursor: 'pointer', fontFamily: "'Sora'", width: '100%', textAlign: 'left' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ width: 10, height: 10, borderRadius: 3, background: iv.color }} />
                     <span style={{ fontSize: 13.5, color: '#F3F1FF', fontWeight: 500 }}>{iv.name}</span>
                   </div>
                   <span style={{ fontFamily: "'Space Grotesk'", fontSize: 14, color: '#fff', fontWeight: 600 }}>{iv.valueStr}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                   <span style={{ fontSize: 11.5, color: '#7C7896' }}>{iv.cls}</span>
                   <span style={{ fontSize: 11.5, color: iv.retColor }}>{iv.ret}</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         ) : (

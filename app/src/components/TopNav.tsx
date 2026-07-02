@@ -37,6 +37,9 @@ export function TopNav() {
       <button onClick={actions.goSpend} style={{ ...itemStyle, color: c('spend') }}>
         <span style={{ fontSize: 15 }}>◑</span>Gastos
       </button>
+      <button onClick={actions.goTxns} style={{ ...itemStyle, color: c('txns') }}>
+        <span style={{ fontSize: 15 }}>≡</span>Extrato
+      </button>
       <button onClick={actions.goInvest} style={{ ...itemStyle, color: c('invest') }}>
         <span style={{ fontSize: 15 }}>▲</span>Investir
       </button>

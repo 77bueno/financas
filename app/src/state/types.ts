@@ -1,4 +1,4 @@
-export type Screen = 'onboard' | 'home' | 'spend' | 'invest' | 'goals' | 'wealth' | 'plan' | 'year' | 'profile';
+export type Screen = 'onboard' | 'home' | 'spend' | 'invest' | 'goals' | 'wealth' | 'plan' | 'year' | 'profile' | 'txns';
 
 export type AccountGroup = 'disp' | 'reserva';
 
@@ -43,16 +43,26 @@ export interface YearPoint {
   v: number;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  bg: string;
+}
+
 export interface Txn {
   id: string;
+  desc: string;
+  cat: string;
   icon: string;
-  name: string;
-  sub: string;
+  date: string; // ISO YYYY-MM-DD
   amount: number;
 }
 
 export type TxnType = 'despesa' | 'receita' | 'transferencia';
 export type QuickKind = 'conta' | 'cofrinho' | 'investimento' | null;
+export type EditKind = 'conta' | 'cofrinho' | 'investimento' | null;
 
 export interface AppState {
   screen: Screen;
@@ -68,6 +78,17 @@ export interface AppState {
   addOpen: boolean;
   addType: TxnType;
   addCat: string;
+  addDesc: string;
+  addEditId: string | null;
+  newCatOpen: boolean;
+  newCatName: string;
+  newCatIcon: string;
+  editKind: EditKind;
+  editId: string | null;
+  editName: string;
+  editCents: number;
+  editCents2: number;
+  editGroup: AccountGroup;
   cents: number;
   toast: boolean;
   toastMsg: string;
@@ -76,6 +97,7 @@ export interface AppState {
   cardBill: number;
   debts: Debt[];
   investPct: number;
+  categories: Category[];
   accounts: Account[];
   investments: Investment[];
   goals: Goal[];

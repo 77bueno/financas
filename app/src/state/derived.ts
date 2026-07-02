@@ -1,6 +1,7 @@
-import type { AppState } from './types';
-import { fmt } from '../utils/format';
-import { CAT_ICONS, CAT_COLORS, CAT_BGS } from './constants';
+import type { AppState, Category } from './types';
+import { fmt, dateLabel } from '../utils/format';
+
+const FALLBACK_CAT: Omit<Category, 'id' | 'name'> = { icon: '💸', color: '#5E4BA0', bg: 'rgba(94,75,160,.16)' };
 
 export function computeDerived(state: AppState) {
   const S = state.salary;
@@ -20,29 +21,40 @@ export function computeDerived(state: AppState) {
   const netWorth = patrimonio - cardBill;
   const hasMoney = patrimonio > 0;
 
-  // month flow, computed from actual transactions
-  const entrou = state.txns.filter(t => t.amount > 0).reduce((a, b) => a + b.amount, 0);
-  const saiu = state.txns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
+  const catByName = new Map(state.categories.map(c => [c.name, c]));
+  const catMeta = (name: string) => catByName.get(name) ?? { ...FALLBACK_CAT, id: '', name };
+
+  // current month scope
+  const now = new Date();
+  const ymPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const monthTxns = state.txns.filter(t => t.date.startsWith(ymPrefix));
+
+  // month flow, computed from this month's transactions
+  const entrou = monthTxns.filter(t => t.amount > 0).reduce((a, b) => a + b.amount, 0);
+  const saiu = monthTxns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
   const sobrou = entrou - saiu;
 
-  // spending by category (expenses only; transfers between accounts don't count)
+  // spending by category this month (transfers between accounts don't count)
   const catTotals = new Map<string, number>();
-  for (const t of state.txns) {
-    if (t.amount < 0 && t.name !== 'Transferência') {
-      catTotals.set(t.name, (catTotals.get(t.name) || 0) + Math.abs(t.amount));
+  for (const t of monthTxns) {
+    if (t.amount < 0 && t.cat !== 'Transferência') {
+      catTotals.set(t.cat, (catTotals.get(t.cat) || 0) + Math.abs(t.amount));
     }
   }
   const totalSpend = [...catTotals.values()].reduce((a, b) => a + b, 0);
   const spendCats = [...catTotals.entries()]
-    .map(([name, total]) => ({
-      name,
-      total,
-      totalStr: fmt(total),
-      icon: CAT_ICONS[name] || '💸',
-      color: CAT_COLORS[name] || '#5E4BA0',
-      bg: CAT_BGS[name] || 'rgba(94,75,160,.16)',
-      pct: totalSpend > 0 ? Math.round((total / totalSpend) * 100) : 0,
-    }))
+    .map(([name, total]) => {
+      const meta = catMeta(name);
+      return {
+        name,
+        total,
+        totalStr: fmt(total),
+        icon: meta.icon,
+        color: meta.color,
+        bg: meta.bg,
+        pct: totalSpend > 0 ? Math.round((total / totalSpend) * 100) : 0,
+      };
+    })
     .sort((a, b) => b.total - a.total);
 
   let accPct = 0;
@@ -77,6 +89,18 @@ export function computeDerived(state: AppState) {
 
   const goalsSaved = state.goals.reduce((a, b) => a + (b.saved || 0), 0);
   const goalsTarget = state.goals.reduce((a, b) => a + (b.target || 0), 0);
+
+  const toTxnRow = (t: AppState['txns'][number]) => ({
+    id: t.id,
+    icon: t.icon,
+    desc: t.desc,
+    cat: t.cat,
+    sub: `${t.cat} · ${dateLabel(t.date)}`,
+    date: t.date,
+    amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
+    color: t.amount < 0 ? '#FF8FB3' : '#6EE7B0',
+    isExpense: t.amount < 0,
+  });
 
   return {
     hasMoney,
@@ -158,17 +182,13 @@ export function computeDerived(state: AppState) {
     }),
     accDisp: state.accounts.filter(a => a.group === 'disp').map(a => ({ id: a.id, icon: a.icon, name: a.name, bank: a.bank, valueStr: fmt(a.value) })),
     accReserva: state.accounts.filter(a => a.group === 'reserva').map(a => ({ id: a.id, icon: a.icon, name: a.name, bank: a.bank, valueStr: fmt(a.value) })),
-    txnRows: state.txns.map(t => ({
-      id: t.id,
-      icon: t.icon,
-      name: t.name,
-      sub: t.sub,
-      amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
-      color: t.amount < 0 ? '#FF8FB3' : '#6EE7B0',
-    })),
+    txnRows: state.txns.map(toTxnRow),
+
     amountStr: fmt(state.cents / 100),
     amountColor: state.addType === 'receita' ? '#6EE7B0' : state.addType === 'transferencia' ? '#E8B96A' : '#FF8FB3',
     quickAmountStr: fmt(state.quickCents / 100),
+    editAmountStr: fmt(state.editCents / 100),
+    editAmount2Str: fmt(state.editCents2 / 100),
   };
 }
 

@@ -1,12 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { AppState, Screen, TxnType, AccountGroup } from './types';
+import type { AppState, Screen, TxnType, AccountGroup, EditKind } from './types';
 import { createInitialState, createDemoState } from './initialState';
-import { CAT_ICONS, MONTHS_PT } from './constants';
-import { nextId, parseDigits } from '../utils/format';
+import { MONTHS_PT, CAT_PALETTE, defaultCategories } from './constants';
+import { nextId, parseDigits, isoDate } from '../utils/format';
 import { computeDerived } from './derived';
 
-const STORAGE_KEY = 'financas-app-state-v2';
+const STORAGE_KEY = 'financas-app-state-v3';
 
 function loadInitial(): AppState {
   const base = createInitialState();
@@ -17,12 +17,18 @@ function loadInitial(): AppState {
       return {
         ...base,
         ...parsed,
+        categories: parsed.categories?.length ? parsed.categories : defaultCategories(),
         hubOpen: false,
         quickOpen: false,
         quickKind: null,
         quickName: '',
         quickCents: 0,
         addOpen: false,
+        addDesc: '',
+        addEditId: null,
+        newCatOpen: false,
+        editKind: null,
+        editId: null,
         cents: 0,
         toast: false,
         toastMsg: '',
@@ -75,7 +81,7 @@ function useFinanceState() {
     });
   }, [patrimonio, state.screen]);
 
-  const showToast = useCallback((msg: string) => {
+  const flashToast = useCallback((msg: string) => {
     setState(p => ({ ...p, toast: true, toastMsg: msg }));
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
@@ -85,30 +91,91 @@ function useFinanceState() {
 
   const toggleEye = useCallback(() => setState(p => ({ ...p, hidden: !p.hidden })), []);
 
-  const press = useCallback((d: number) => setState(p => ({ ...p, cents: Math.min(p.cents * 10 + d, 99999999) })), []);
-  const backspace = useCallback(() => setState(p => ({ ...p, cents: Math.floor(p.cents / 10) })), []);
+  const setCents = useCallback((v: string) => setState(p => ({ ...p, cents: Math.min(parseDigits(v), 99999999) })), []);
+  const setAddDesc = useCallback((v: string) => setState(p => ({ ...p, addDesc: v })), []);
+
+  // ---- transactions (create / edit / delete) ----
+  const openAdd = useCallback(() => setState(p => ({
+    ...p, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa', newCatOpen: false,
+  })), []);
+  const closeAdd = useCallback(() => setState(p => ({ ...p, addOpen: false, addEditId: null })), []);
+  const addTxn = useCallback(() => setState(p => ({
+    ...p, hubOpen: false, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa', newCatOpen: false,
+  })), []);
+
+  const openEditTxn = useCallback((id: string) => {
+    setState(p => {
+      const t = p.txns.find(x => x.id === id);
+      if (!t) return p;
+      return {
+        ...p,
+        addOpen: true,
+        addEditId: id,
+        addDesc: t.desc,
+        cents: Math.round(Math.abs(t.amount) * 100),
+        addType: t.amount > 0 ? 'receita' : t.cat === 'Transferência' ? 'transferencia' : 'despesa',
+        addCat: t.cat !== 'Receita' && t.cat !== 'Transferência' ? t.cat : p.addCat,
+        newCatOpen: false,
+      };
+    });
+  }, []);
 
   const save = useCallback(() => {
     setState(p => {
       const val = p.cents / 100;
-      if (val <= 0) return { ...p, addOpen: false };
+      if (val <= 0) return { ...p, addOpen: false, addEditId: null };
       const type = p.addType;
-      const tx =
+      const catMeta = p.categories.find(c => c.name === p.addCat);
+      const base =
         type === 'receita'
-          ? { id: nextId('txn'), icon: '💰', name: 'Receita', sub: 'Hoje', amount: val }
+          ? { cat: 'Receita', icon: '💰', amount: val }
           : type === 'transferencia'
-            ? { id: nextId('txn'), icon: '🔁', name: 'Transferência', sub: 'Hoje', amount: -val }
-            : { id: nextId('txn'), icon: CAT_ICONS[p.addCat] || '💸', name: p.addCat, sub: 'Hoje', amount: -val };
-      return { ...p, txns: [tx, ...p.txns], addOpen: false, cents: 0, toast: true, toastMsg: '✓ Transação adicionada' };
+            ? { cat: 'Transferência', icon: '🔁', amount: -val }
+            : { cat: p.addCat, icon: catMeta?.icon || '💸', amount: -val };
+      const desc = p.addDesc.trim() || base.cat;
+      if (p.addEditId) {
+        return {
+          ...p,
+          txns: p.txns.map(t => t.id === p.addEditId ? { ...t, ...base, desc } : t),
+          addOpen: false, addEditId: null, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação atualizada',
+        };
+      }
+      const tx = { id: nextId('txn'), desc, date: isoDate(new Date()), ...base };
+      return { ...p, txns: [tx, ...p.txns], addOpen: false, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação adicionada' };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
 
+  const deleteTxn = useCallback((id: string) => {
+    setState(p => ({ ...p, txns: p.txns.filter(t => t.id !== id), addOpen: false, addEditId: null, toast: true, toastMsg: '✓ Transação excluída' }));
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  // ---- custom categories ----
+  const toggleNewCat = useCallback(() => setState(p => ({ ...p, newCatOpen: !p.newCatOpen, newCatName: '', newCatIcon: '🎓' })), []);
+  const setNewCatName = useCallback((v: string) => setState(p => ({ ...p, newCatName: v })), []);
+  const setNewCatIcon = useCallback((v: string) => setState(p => ({ ...p, newCatIcon: v })), []);
+  const saveNewCat = useCallback(() => {
+    setState(p => {
+      const name = p.newCatName.trim();
+      if (!name) return { ...p, newCatOpen: false };
+      if (p.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        return { ...p, newCatOpen: false, addCat: p.categories.find(c => c.name.toLowerCase() === name.toLowerCase())!.name };
+      }
+      const pal = CAT_PALETTE[p.categories.length % CAT_PALETTE.length];
+      const cat = { id: nextId('cat'), name, icon: p.newCatIcon, color: pal.color, bg: pal.bg };
+      return { ...p, categories: [...p.categories, cat], addCat: name, newCatOpen: false, newCatName: '' };
+    });
+  }, []);
+
+  // ---- profile ----
   const setSalary = useCallback((v: string) => setState(p => ({ ...p, salary: parseDigits(v) })), []);
   const setCardBill = useCallback((v: string) => setState(p => ({ ...p, cardBill: parseDigits(v) })), []);
   const setUserName = useCallback((v: string) => setState(p => ({ ...p, userName: v })), []);
 
+  // ---- planner debts ----
   const updateDebt = useCallback((id: string, field: 'name' | 'value', v: string) => {
     setState(p => ({
       ...p,
@@ -118,6 +185,7 @@ function useFinanceState() {
   const addDebt = useCallback(() => setState(p => ({ ...p, debts: [...p.debts, { id: nextId('debt'), name: '', value: 0 }] })), []);
   const removeDebt = useCallback((id: string) => setState(p => ({ ...p, debts: p.debts.filter(d => d.id !== id) })), []);
 
+  // ---- onboarding ----
   const startManual = useCallback(() => setState(p => ({ ...p, onbStep: 1 })), []);
   const loadDemo = useCallback(() => {
     setState(p => ({ ...p, connecting: true }));
@@ -127,7 +195,6 @@ function useFinanceState() {
   const onbNext = useCallback(() => {
     setState(p => {
       const next = p.onbStep + 1;
-      // entering the accounts step with nothing yet: seed one blank row
       if (next === 2 && p.accounts.length === 0) {
         return { ...p, onbStep: next, accounts: [{ id: nextId('acc'), icon: '🏦', name: '', bank: 'Conta', value: 0, group: 'disp' as const }] };
       }
@@ -153,14 +220,14 @@ function useFinanceState() {
   }, []);
   const removeAccount = useCallback((id: string) => setState(p => ({ ...p, accounts: p.accounts.filter(a => a.id !== id) })), []);
 
+  // ---- hub / quick add ----
   const openHub = useCallback(() => setState(p => ({ ...p, hubOpen: true })), []);
   const closeHub = useCallback(() => setState(p => ({ ...p, hubOpen: false })), []);
   const openQuick = useCallback((kind: 'conta' | 'cofrinho' | 'investimento') => {
     setState(p => ({ ...p, hubOpen: false, quickOpen: true, quickKind: kind, quickName: '', quickCents: 0, quickGroup: 'disp' }));
   }, []);
   const closeQuick = useCallback(() => setState(p => ({ ...p, quickOpen: false })), []);
-  const quickPress = useCallback((d: number) => setState(p => ({ ...p, quickCents: Math.min(p.quickCents * 10 + d, 9999999999) })), []);
-  const quickBack = useCallback(() => setState(p => ({ ...p, quickCents: Math.floor(p.quickCents / 10) })), []);
+  const setQuickCents = useCallback((v: string) => setState(p => ({ ...p, quickCents: Math.min(parseDigits(v), 9999999999) })), []);
   const setQuickName = useCallback((v: string) => setState(p => ({ ...p, quickName: v })), []);
   const setQuickGroup = useCallback((g: AccountGroup) => setState(p => ({ ...p, quickGroup: g })), []);
 
@@ -188,6 +255,64 @@ function useFinanceState() {
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
 
+  // ---- edit existing items (conta / investimento / cofrinho) ----
+  const openEditItem = useCallback((kind: Exclude<EditKind, null>, id: string) => {
+    setState(p => {
+      if (kind === 'conta') {
+        const a = p.accounts.find(x => x.id === id);
+        if (!a) return p;
+        return { ...p, editKind: kind, editId: id, editName: a.name, editCents: Math.round(a.value * 100), editCents2: 0, editGroup: a.group };
+      }
+      if (kind === 'investimento') {
+        const iv = p.investments.find(x => x.id === id);
+        if (!iv) return p;
+        return { ...p, editKind: kind, editId: id, editName: iv.name, editCents: Math.round(iv.value * 100), editCents2: 0 };
+      }
+      const g = p.goals.find(x => x.id === id);
+      if (!g) return p;
+      return { ...p, editKind: kind, editId: id, editName: g.name, editCents: Math.round(g.saved * 100), editCents2: Math.round(g.target * 100) };
+    });
+  }, []);
+  const closeEdit = useCallback(() => setState(p => ({ ...p, editKind: null, editId: null })), []);
+  const setEditName = useCallback((v: string) => setState(p => ({ ...p, editName: v })), []);
+  const setEditCents = useCallback((v: string) => setState(p => ({ ...p, editCents: Math.min(parseDigits(v), 9999999999) })), []);
+  const setEditCents2 = useCallback((v: string) => setState(p => ({ ...p, editCents2: Math.min(parseDigits(v), 9999999999) })), []);
+  const setEditGroup = useCallback((g: AccountGroup) => setState(p => ({ ...p, editGroup: g })), []);
+
+  const saveEdit = useCallback(() => {
+    setState(p => {
+      const { editKind: kind, editId: id } = p;
+      if (!kind || !id) return p;
+      const name = p.editName.trim();
+      const val = p.editCents / 100;
+      let next: Partial<AppState> = {};
+      if (kind === 'conta') {
+        next = { accounts: p.accounts.map(a => a.id === id ? { ...a, name: name || a.name, value: val, group: p.editGroup, icon: p.editGroup === 'reserva' ? '🐷' : a.icon } : a) };
+      } else if (kind === 'investimento') {
+        next = { investments: p.investments.map(iv => iv.id === id ? { ...iv, name: name || iv.name, value: val } : iv) };
+      } else {
+        next = { goals: p.goals.map(g => g.id === id ? { ...g, name: name || g.name, saved: val, target: p.editCents2 / 100 || g.target } : g) };
+      }
+      return { ...p, ...next, editKind: null, editId: null, toast: true, toastMsg: '✓ Alterações salvas' };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  const deleteEdit = useCallback(() => {
+    setState(p => {
+      const { editKind: kind, editId: id } = p;
+      if (!kind || !id) return p;
+      let next: Partial<AppState> = {};
+      if (kind === 'conta') next = { accounts: p.accounts.filter(a => a.id !== id) };
+      else if (kind === 'investimento') next = { investments: p.investments.filter(iv => iv.id !== id) };
+      else next = { goals: p.goals.filter(g => g.id !== id) };
+      return { ...p, ...next, editKind: null, editId: null, toast: true, toastMsg: '✓ Excluído' };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
   const resetAll = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setState(createInitialState());
@@ -196,9 +321,6 @@ function useFinanceState() {
   const setInvestPct = useCallback((v: number) => setState(p => ({ ...p, investPct: v })), []);
   const setAddType = useCallback((t: TxnType) => setState(p => ({ ...p, addType: t })), []);
   const setAddCat = useCallback((c: string) => setState(p => ({ ...p, addCat: c })), []);
-  const openAdd = useCallback(() => setState(p => ({ ...p, addOpen: true })), []);
-  const closeAdd = useCallback(() => setState(p => ({ ...p, addOpen: false })), []);
-  const addTxn = useCallback(() => setState(p => ({ ...p, hubOpen: false, addOpen: true })), []);
 
   const actions = useMemo(() => ({
     go,
@@ -210,10 +332,17 @@ function useFinanceState() {
     goPlan: () => go('plan'),
     goYear: () => go('year'),
     goProfile: () => go('profile'),
+    goTxns: () => go('txns'),
     toggleEye,
-    press,
-    backspace,
+    setCents,
+    setAddDesc,
     save,
+    deleteTxn,
+    openEditTxn,
+    toggleNewCat,
+    setNewCatName,
+    setNewCatIcon,
+    saveNewCat,
     setSalary,
     setCardBill,
     setUserName,
@@ -232,11 +361,18 @@ function useFinanceState() {
     closeHub,
     openQuick,
     closeQuick,
-    quickPress,
-    quickBack,
+    setQuickCents,
     setQuickName,
     setQuickGroup,
     saveQuick,
+    openEditItem,
+    closeEdit,
+    setEditName,
+    setEditCents,
+    setEditCents2,
+    setEditGroup,
+    saveEdit,
+    deleteEdit,
     resetAll,
     setInvestPct,
     setAddType,
@@ -244,11 +380,13 @@ function useFinanceState() {
     openAdd,
     closeAdd,
     addTxn,
-    showToast,
-  }), [go, toggleEye, press, backspace, save, setSalary, setCardBill, setUserName, updateDebt, addDebt, removeDebt,
+    flashToast,
+  }), [go, toggleEye, setCents, setAddDesc, save, deleteTxn, openEditTxn, toggleNewCat, setNewCatName, setNewCatIcon,
+      saveNewCat, setSalary, setCardBill, setUserName, updateDebt, addDebt, removeDebt,
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
-      openHub, closeHub, openQuick, closeQuick, quickPress, quickBack, setQuickName, setQuickGroup, saveQuick,
-      resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, showToast]);
+      openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, saveQuick,
+      openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, saveEdit, deleteEdit,
+      resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
 
   const derived = useMemo(() => computeDerived(state), [state]);
 

@@ -191,17 +191,24 @@ export function Home() {
 
       {/* recent */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <strong style={{ fontSize: 15, color: '#F3F1FF', fontWeight: 600 }}>Últimas transações</strong>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <strong style={{ fontSize: 15, color: '#F3F1FF', fontWeight: 600 }}>Últimas transações</strong>
+          <button onClick={actions.goTxns} style={{ background: 'none', border: 'none', fontSize: 12.5, color: '#B9A6FF', cursor: 'pointer', fontFamily: "'Sora'" }}>Ver todas ›</button>
+        </div>
         {derived.txnRows.length > 0 ? (
           derived.txnRows.slice(0, 8).map(t => (
-            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '4px 0' }}>
+            <button
+              key={t.id}
+              onClick={() => actions.openEditTxn(t.id)}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '4px 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Sora'", textAlign: 'left', width: '100%' }}
+            >
               <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>{t.icon}</div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <span style={{ fontSize: 13.5, color: '#F3F1FF', fontWeight: 500 }}>{t.name}</span>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 13.5, color: '#F3F1FF', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.desc}</span>
                 <span style={{ fontSize: 11.5, color: '#7C7896' }}>{t.sub}</span>
               </div>
               <span style={{ fontFamily: "'Space Grotesk'", fontSize: 14, fontWeight: 600, color: t.color }}>{t.amountStr}</span>
-            </div>
+            </button>
           ))
         ) : (
           <button

@@ -24,7 +24,10 @@ export function Goals() {
       {derived.hasGoals ? (
         <div className="grid-2">
           {derived.goalRows.map(g => (
-            <div key={g.id} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 20, padding: 18, display: 'flex', flexDirection: 'column', gap: 13 }}>
+            <button
+              key={g.id}
+              onClick={() => actions.openEditItem('cofrinho', g.id)}
+              style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 20, padding: 18, display: 'flex', flexDirection: 'column', gap: 13, cursor: 'pointer', fontFamily: "'Sora'", textAlign: 'left', width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 13, background: 'rgba(142,123,255,.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>{g.icon}</div>
                 <div style={{ flex: 1 }}>
@@ -33,14 +36,14 @@ export function Goals() {
                 </div>
                 <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13, color: '#B9A6FF', fontWeight: 600 }}>{g.pctStr}</span>
               </div>
-              <div style={{ height: 9, background: 'rgba(255,255,255,.08)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: 9, background: 'rgba(255,255,255,.08)', borderRadius: 99, overflow: 'hidden', width: '100%' }}>
                 <div style={{ width: g.barW, height: '100%', background: 'linear-gradient(90deg,#8E7BFF,#B9A6FF)', borderRadius: 99 }} />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, width: '100%' }}>
                 <span style={{ color: '#C9C5DE', fontFamily: "'Space Grotesk'" }}>{g.savedStr}</span>
                 <span style={{ color: '#7C7896' }}>de {g.targetStr}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       ) : (

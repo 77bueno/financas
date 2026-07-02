@@ -8,9 +8,12 @@ export function Spend() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn .3s both' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em' }}>ONDE GASTEI</span>
-        <strong style={{ fontSize: 22, color: '#F3F1FF', fontWeight: 700 }}>{title}</strong>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em' }}>ONDE GASTEI</span>
+          <strong style={{ fontSize: 22, color: '#F3F1FF', fontWeight: 700 }}>{title}</strong>
+        </div>
+        <button onClick={actions.goTxns} style={{ background: 'none', border: 'none', fontSize: 12.5, color: '#B9A6FF', cursor: 'pointer', fontFamily: "'Sora'" }}>ver extrato ›</button>
       </div>
 
       {derived.totalSpend > 0 ? (

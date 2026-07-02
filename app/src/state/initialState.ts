@@ -1,5 +1,6 @@
 import type { AppState } from './types';
-import { nextId } from '../utils/format';
+import { nextId, isoDate, isoDaysAgo } from '../utils/format';
+import { defaultCategories } from './constants';
 
 export function createInitialState(): AppState {
   return {
@@ -16,6 +17,17 @@ export function createInitialState(): AppState {
     addOpen: false,
     addType: 'despesa',
     addCat: 'Alimentação',
+    addDesc: '',
+    addEditId: null,
+    newCatOpen: false,
+    newCatName: '',
+    newCatIcon: '🎓',
+    editKind: null,
+    editId: null,
+    editName: '',
+    editCents: 0,
+    editCents2: 0,
+    editGroup: 'disp',
     cents: 0,
     toast: false,
     toastMsg: '',
@@ -24,6 +36,7 @@ export function createInitialState(): AppState {
     cardBill: 0,
     debts: [],
     investPct: 30,
+    categories: defaultCategories(),
     accounts: [],
     investments: [],
     goals: [],
@@ -34,6 +47,15 @@ export function createInitialState(): AppState {
 
 /** Demo dataset ("Larissa") so people can explore the platform filled in. */
 export function createDemoState(): AppState {
+  const now = new Date();
+  const ym = (offset: number) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  };
+  const ml = (offset: number) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    return ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][d.getMonth()];
+  };
   return {
     ...createInitialState(),
     screen: 'home',
@@ -63,17 +85,17 @@ export function createDemoState(): AppState {
       { id: nextId('goal'), icon: '📱', name: 'Trocar celular', sub: 'Setembro 2026', saved: 900, target: 2500, color: '#E8B96A' },
     ],
     yearData: [
-      { key: '2026-01', m: 'Jan', v: 38200 }, { key: '2026-02', m: 'Fev', v: 39800 },
-      { key: '2026-03', m: 'Mar', v: 41100 }, { key: '2026-04', m: 'Abr', v: 43050 },
-      { key: '2026-05', m: 'Mai', v: 46410 }, { key: '2026-06', m: 'Jun', v: 47890 },
+      { key: ym(5), m: ml(5), v: 38200 }, { key: ym(4), m: ml(4), v: 39800 },
+      { key: ym(3), m: ml(3), v: 41100 }, { key: ym(2), m: ml(2), v: 43050 },
+      { key: ym(1), m: ml(1), v: 46410 },
     ],
     txns: [
-      { id: nextId('txn'), icon: '💰', name: 'Salário', sub: 'Hoje · Conta corrente', amount: 5600 },
-      { id: nextId('txn'), icon: '🛒', name: 'Alimentação', sub: 'Ontem · Mercado', amount: -238.90 },
-      { id: nextId('txn'), icon: '🍔', name: 'Alimentação', sub: 'Ontem · iFood', amount: -52.40 },
-      { id: nextId('txn'), icon: '🚗', name: 'Transporte', sub: '28 jun · Uber', amount: -19.80 },
-      { id: nextId('txn'), icon: '📺', name: 'Assinaturas', sub: '27 jun · Netflix', amount: -55.90 },
-      { id: nextId('txn'), icon: '🏠', name: 'Moradia', sub: '25 jun · Aluguel', amount: -1100 },
+      { id: nextId('txn'), desc: 'Salário', cat: 'Receita', icon: '💰', date: isoDate(now), amount: 5600 },
+      { id: nextId('txn'), desc: 'Mercado Extra', cat: 'Alimentação', icon: '🛒', date: isoDaysAgo(1), amount: -238.90 },
+      { id: nextId('txn'), desc: 'iFood', cat: 'Alimentação', icon: '🍔', date: isoDaysAgo(1), amount: -52.40 },
+      { id: nextId('txn'), desc: 'Uber', cat: 'Transporte', icon: '🚗', date: isoDaysAgo(3), amount: -19.80 },
+      { id: nextId('txn'), desc: 'Netflix', cat: 'Assinaturas', icon: '📺', date: isoDaysAgo(4), amount: -55.90 },
+      { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(6), amount: -1100 },
     ],
   };
 }

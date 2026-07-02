@@ -1,6 +1,6 @@
 import { useFinance } from '../state/store';
 import { QUICK_TITLE, QUICK_VAL_LABEL, QUICK_PLACEHOLDER } from '../state/constants';
-import { Keypad } from './Keypad';
+import { AmountField } from './AmountField';
 
 export function QuickAddSheet() {
   const { state, actions, derived } = useFinance();
@@ -18,7 +18,7 @@ export function QuickAddSheet() {
         className="sheet"
         style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, background: '#15112b',
-          borderRadius: '28px 28px 41px 41px', borderTop: '1px solid rgba(255,255,255,.1)',
+          borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
         }}
       >
@@ -62,6 +62,7 @@ export function QuickAddSheet() {
           value={state.quickName}
           onChange={e => actions.setQuickName(e.target.value)}
           placeholder={QUICK_PLACEHOLDER[kind] ?? 'Nome'}
+          autoFocus
           style={{
             width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
             borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Sora'", fontSize: 14,
@@ -69,14 +70,7 @@ export function QuickAddSheet() {
           }}
         />
 
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <span style={{ fontSize: 13, color: '#9C97B8' }}>{QUICK_VAL_LABEL[kind] ?? 'Valor'}</span>
-          <div style={{ fontFamily: "'Space Grotesk'", fontSize: 40, fontWeight: 600, color: '#fff', letterSpacing: '-.02em' }}>
-            {derived.quickAmountStr}
-          </div>
-        </div>
-
-        <Keypad onDigit={actions.quickPress} onBackspace={actions.quickBack} />
+        <AmountField label={QUICK_VAL_LABEL[kind] ?? 'Valor'} valueStr={derived.quickAmountStr} onDigits={actions.setQuickCents} />
 
         <button
           onClick={actions.saveQuick}

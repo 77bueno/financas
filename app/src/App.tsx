@@ -8,6 +8,8 @@ import { Wealth } from './screens/Wealth';
 import { Plan } from './screens/Plan';
 import { Year } from './screens/Year';
 import { Profile } from './screens/Profile';
+import { Txns } from './screens/Txns';
+import { EditSheet } from './components/EditSheet';
 import { AddTransactionSheet } from './components/AddTransactionSheet';
 import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
@@ -27,6 +29,7 @@ function Screen() {
     case 'plan': return <Plan />;
     case 'year': return <Year />;
     case 'profile': return <Profile />;
+    case 'txns': return <Txns />;
     default: return null;
   }
 }
@@ -46,6 +49,7 @@ function AppShell() {
         <ToastGate />
         <Hub />
         <QuickAddSheet />
+        <EditSheet />
         <TabBar />
       </div>
     </div>
