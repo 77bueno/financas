@@ -29,9 +29,11 @@ export function computeDerived(state: AppState) {
   const ymPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const monthTxns = state.txns.filter(t => t.date.startsWith(ymPrefix));
 
-  // month flow, computed from this month's transactions
-  const entrou = monthTxns.filter(t => t.amount > 0).reduce((a, b) => a + b.amount, 0);
-  const saiu = monthTxns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
+  // month flow from this month's transactions; transfers between own
+  // accounts move money around but don't enter or leave
+  const flowTxns = monthTxns.filter(t => t.cat !== 'Transferência');
+  const entrou = flowTxns.filter(t => t.amount > 0).reduce((a, b) => a + b.amount, 0);
+  const saiu = flowTxns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
   const sobrou = entrou - saiu;
 
   // spending by category this month (transfers between accounts don't count)
@@ -90,17 +92,25 @@ export function computeDerived(state: AppState) {
   const goalsSaved = state.goals.reduce((a, b) => a + (b.saved || 0), 0);
   const goalsTarget = state.goals.reduce((a, b) => a + (b.target || 0), 0);
 
-  const toTxnRow = (t: AppState['txns'][number]) => ({
-    id: t.id,
-    icon: t.icon,
-    desc: t.desc,
-    cat: t.cat,
-    sub: `${t.cat} · ${dateLabel(t.date)}`,
-    date: t.date,
-    amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
-    color: t.amount < 0 ? '#FF8FB3' : '#6EE7B0',
-    isExpense: t.amount < 0,
-  });
+  const accById = new Map(state.accounts.map(a => [a.id, a]));
+  const toTxnRow = (t: AppState['txns'][number]) => {
+    const acc = t.accountId ? accById.get(t.accountId) : undefined;
+    const toAcc = t.toAccountId ? accById.get(t.toAccountId) : undefined;
+    const accLabel = t.cat === 'Transferência' && acc && toAcc
+      ? ` · ${acc.name} → ${toAcc.name}`
+      : acc ? ` · ${acc.name}` : '';
+    return {
+      id: t.id,
+      icon: t.icon,
+      desc: t.desc,
+      cat: t.cat,
+      sub: `${t.cat} · ${dateLabel(t.date)}${accLabel}`,
+      date: t.date,
+      amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
+      color: t.amount < 0 ? '#FF8FB3' : '#6EE7B0',
+      isExpense: t.amount < 0,
+    };
+  };
 
   return {
     hasMoney,

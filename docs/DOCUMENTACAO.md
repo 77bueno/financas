@@ -88,11 +88,13 @@ Campos da folha "Nova transação":
 |---|---|
 | **Tipo** | Despesa · Receita · Transferência (segmentado) |
 | **Descrição** | Texto livre — ex.: *"Assinatura Claude"*, *"Faculdade"*, *"Final de semana"*, *"Conta do celular"*. Se vazio, usa o nome da categoria |
+| **Data** | Padrão hoje; editável (lançamento retroativo entra no mês correto dos relatórios) |
 | **Valor** | Campo digitado com formatação ao vivo em centavos: digitar `12050` exibe `R$ 120,50` |
+| **Conta** | Chips com suas contas. Despesa/transferência **debita** a conta escolhida; receita **credita**. Transferência pede também a conta de destino ("entra na conta") e move o dinheiro entre as duas. Opcional: sem conta selecionada, os saldos não mudam |
 | **Categoria** | Só para despesas. Chips com as categorias existentes + **"+ nova categoria"** |
 
-- **Receita** entra positiva (verde). **Despesa** e **Transferência** saem negativas — mas transferência **não conta** como gasto por categoria (é dinheiro movendo entre contas suas).
-- A data é registrada automaticamente (hoje).
+- **Os saldos das contas atualizam automaticamente** — inclusive ao **editar** (o efeito antigo é revertido e o novo aplicado) e ao **excluir** (o efeito é revertido).
+- **Transferência** não conta como gasto por categoria **nem** no Entrou/Saiu do mês — é dinheiro movendo entre contas suas.
 - Salvar mostra um toast de confirmação e a transação aparece na Início e no Extrato.
 
 ### 3.3 Categorias personalizadas
@@ -282,7 +284,7 @@ Tipos principais (completos em [`app/src/state/types.ts`](../app/src/state/types
 
 | Entidade | Campos | Observações |
 |---|---|---|
-| `Txn` | `id, desc, cat, icon, date (ISO), amount` | `amount` > 0 = receita; < 0 = saída. `cat` especial: `"Receita"`, `"Transferência"` |
+| `Txn` | `id, desc, cat, icon, date (ISO), amount, accountId?, toAccountId?` | `amount` > 0 = receita; < 0 = saída. `cat` especial: `"Receita"`, `"Transferência"`. `accountId` = conta debitada/creditada; `toAccountId` = destino da transferência |
 | `Category` | `id, name, icon, color, bg` | 7 padrão + criadas pelo usuário (paleta em rotação) |
 | `Account` | `id, icon, name, bank, value, group` | `group`: `'disp'` (disponível) ou `'reserva'` (guardado) |
 | `Investment` | `id, name, value, cls, ret, good, color` | `cls/ret` são rótulos exibidos; aportes novos entram como `"aporte"` |
@@ -303,7 +305,8 @@ Todas implementadas em [`app/src/state/derived.ts`](../app/src/state/derived.ts)
 | **Patrimônio total** | soma de todas as contas + todos os investimentos |
 | **Patrimônio líquido** | patrimônio − fatura do cartão (`cardBill`) |
 | **Alocação (barra da Início)** | proporção investido / reserva / disponível sobre o patrimônio |
-| **Entrou / Saiu / Sobrou** | somas das transações **do mês corrente** (positivas / negativas / diferença) |
+| **Entrou / Saiu / Sobrou** | somas das transações **do mês corrente** (positivas / negativas / diferença), **excluindo transferências** entre contas próprias |
+| **Saldo das contas** | ajustado automaticamente por cada transação vinculada a conta: criar aplica o efeito, editar reverte o antigo e aplica o novo, excluir reverte |
 | **Gastos por categoria (donut)** | transações negativas do mês, **excluindo Transferência**, agrupadas por `cat`; segmentos do donut são um `conic-gradient` gerado com as cores das categorias |
 | **Insight da Início** | aparece só quando `sobrou > 0`: "sobraram R$ X — que tal investir?" |
 | **Comprometimento (planner)** | dívidas ÷ salário; verde ≤ 30%, amarelo 31–40%, rosa > 40% |
@@ -373,19 +376,19 @@ Não há passo manual: fazer merge/push na `main` publica. O `base: '/financas/'
 
 **Limitações atuais (por design ou escopo):**
 
-- Transações não são vinculadas a uma conta específica — registrar um gasto **não debita** o saldo de uma conta automaticamente; saldos de contas são ajustados manualmente (tocando na conta).
-- A data da transação é sempre "hoje" (sem lançamento retroativo).
 - Sem recorrência (assinaturas mensais precisam ser lançadas a cada mês).
 - Rendimento de investimentos é um rótulo informativo, não calculado.
 - Dados não sincronizam entre dispositivos (100% local).
 - Categorias podem ser criadas, mas ainda não renomeadas/excluídas.
+- O relatório de gastos mostra apenas o mês corrente (sem navegar meses anteriores).
 
 **Roadmap sugerido (em ordem de impacto):**
 
-1. **Transação ↔ conta**: escolher a conta de origem/destino e atualizar saldo automaticamente (transferência passa a mover dinheiro entre contas de verdade).
-2. **Data retroativa** no lançamento e edição.
-3. **Despesas recorrentes** (assinaturas geradas automaticamente todo mês).
+1. **Despesas recorrentes** (assinaturas geradas automaticamente todo mês).
+2. **Orçamento por categoria** (limite mensal + barra de progresso + alerta de estouro).
+3. **Navegar meses anteriores** no relatório de gastos.
 4. Gerenciar categorias (renomear, excluir, reordenar).
-5. Orçamento por categoria (limite mensal + alerta de estouro).
-6. Exportar/importar dados (JSON/CSV) — também resolve backup e migração de dispositivo.
-7. Sincronização opcional em nuvem (exigiria backend + autenticação).
+5. Exportar/importar dados (JSON/CSV) — também resolve backup e migração de dispositivo.
+6. Desfazer exclusões pelo toast.
+7. Modo claro (tema).
+8. Sincronização opcional em nuvem (exigiria backend + autenticação).

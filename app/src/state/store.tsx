@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { AppState, Screen, TxnType, AccountGroup, EditKind } from './types';
+import type { AppState, Screen, TxnType, AccountGroup, EditKind, Txn, Account } from './types';
 import { createInitialState, createDemoState } from './initialState';
 import { MONTHS_PT, CAT_PALETTE, defaultCategories } from './constants';
 import { nextId, parseDigits, isoDate } from '../utils/format';
@@ -43,6 +43,21 @@ function loadInitial(): AppState {
 
 function monthKey(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Applies (sign=+1) or reverts (sign=-1) a transaction's effect on account
+ * balances. Despesa/receita move `amount` on the source account; transfers
+ * additionally credit the destination account.
+ */
+function applyTxnToAccounts(accounts: Account[], t: Pick<Txn, 'amount' | 'accountId' | 'toAccountId' | 'cat'>, sign: 1 | -1): Account[] {
+  if (!t.accountId && !t.toAccountId) return accounts;
+  return accounts.map(a => {
+    let v = a.value;
+    if (a.id === t.accountId) v += sign * t.amount;
+    if (t.cat === 'Transferência' && a.id === t.toAccountId) v += sign * Math.abs(t.amount);
+    return v === a.value ? a : { ...a, value: Math.round(v * 100) / 100 };
+  });
 }
 
 function useFinanceState() {
@@ -95,13 +110,19 @@ function useFinanceState() {
   const setAddDesc = useCallback((v: string) => setState(p => ({ ...p, addDesc: v })), []);
 
   // ---- transactions (create / edit / delete) ----
-  const openAdd = useCallback(() => setState(p => ({
-    ...p, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa', newCatOpen: false,
-  })), []);
+  const freshAdd = (p: AppState): AppState => ({
+    ...p, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa' as const, newCatOpen: false,
+    addDate: isoDate(new Date()),
+    addAccountId: p.accounts.find(a => a.group === 'disp')?.id ?? p.accounts[0]?.id ?? null,
+    addToAccountId: null,
+  });
+  const openAdd = useCallback(() => setState(p => freshAdd(p)), []);
   const closeAdd = useCallback(() => setState(p => ({ ...p, addOpen: false, addEditId: null })), []);
-  const addTxn = useCallback(() => setState(p => ({
-    ...p, hubOpen: false, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa', newCatOpen: false,
-  })), []);
+  const addTxn = useCallback(() => setState(p => ({ ...freshAdd(p), hubOpen: false })), []);
+
+  const setAddDate = useCallback((v: string) => setState(p => (v ? { ...p, addDate: v } : p)), []);
+  const setAddAccountId = useCallback((id: string | null) => setState(p => ({ ...p, addAccountId: id })), []);
+  const setAddToAccountId = useCallback((id: string | null) => setState(p => ({ ...p, addToAccountId: id })), []);
 
   const openEditTxn = useCallback((id: string) => {
     setState(p => {
@@ -115,6 +136,9 @@ function useFinanceState() {
         cents: Math.round(Math.abs(t.amount) * 100),
         addType: t.amount > 0 ? 'receita' : t.cat === 'Transferência' ? 'transferencia' : 'despesa',
         addCat: t.cat !== 'Receita' && t.cat !== 'Transferência' ? t.cat : p.addCat,
+        addDate: t.date,
+        addAccountId: t.accountId ?? null,
+        addToAccountId: t.toAccountId ?? null,
         newCatOpen: false,
       };
     });
@@ -133,22 +157,38 @@ function useFinanceState() {
             ? { cat: 'Transferência', icon: '🔁', amount: -val }
             : { cat: p.addCat, icon: catMeta?.icon || '💸', amount: -val };
       const desc = p.addDesc.trim() || base.cat;
+      const accountId = p.addAccountId;
+      const toAccountId = type === 'transferencia' && p.addToAccountId !== p.addAccountId ? p.addToAccountId : null;
+
       if (p.addEditId) {
+        const old = p.txns.find(t => t.id === p.addEditId);
+        if (!old) return { ...p, addOpen: false, addEditId: null };
+        const updated: Txn = { ...old, ...base, desc, date: p.addDate, accountId, toAccountId };
+        let accounts = applyTxnToAccounts(p.accounts, old, -1);
+        accounts = applyTxnToAccounts(accounts, updated, 1);
         return {
           ...p,
-          txns: p.txns.map(t => t.id === p.addEditId ? { ...t, ...base, desc } : t),
+          accounts,
+          txns: p.txns.map(t => (t.id === p.addEditId ? updated : t)),
           addOpen: false, addEditId: null, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação atualizada',
         };
       }
-      const tx = { id: nextId('txn'), desc, date: isoDate(new Date()), ...base };
-      return { ...p, txns: [tx, ...p.txns], addOpen: false, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação adicionada' };
+
+      const tx: Txn = { id: nextId('txn'), desc, date: p.addDate, accountId, toAccountId, ...base };
+      const accounts = applyTxnToAccounts(p.accounts, tx, 1);
+      const txns = [tx, ...p.txns].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+      return { ...p, accounts, txns, addOpen: false, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação adicionada' };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
 
   const deleteTxn = useCallback((id: string) => {
-    setState(p => ({ ...p, txns: p.txns.filter(t => t.id !== id), addOpen: false, addEditId: null, toast: true, toastMsg: '✓ Transação excluída' }));
+    setState(p => {
+      const t = p.txns.find(x => x.id === id);
+      const accounts = t ? applyTxnToAccounts(p.accounts, t, -1) : p.accounts;
+      return { ...p, accounts, txns: p.txns.filter(x => x.id !== id), addOpen: false, addEditId: null, toast: true, toastMsg: '✓ Transação excluída' };
+    });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
@@ -336,6 +376,9 @@ function useFinanceState() {
     toggleEye,
     setCents,
     setAddDesc,
+    setAddDate,
+    setAddAccountId,
+    setAddToAccountId,
     save,
     deleteTxn,
     openEditTxn,
@@ -381,7 +424,7 @@ function useFinanceState() {
     closeAdd,
     addTxn,
     flashToast,
-  }), [go, toggleEye, setCents, setAddDesc, save, deleteTxn, openEditTxn, toggleNewCat, setNewCatName, setNewCatIcon,
+  }), [go, toggleEye, setCents, setAddDesc, setAddDate, setAddAccountId, setAddToAccountId, save, deleteTxn, openEditTxn, toggleNewCat, setNewCatName, setNewCatIcon,
       saveNewCat, setSalary, setCardBill, setUserName, updateDebt, addDebt, removeDebt,
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
       openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, saveQuick,

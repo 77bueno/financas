@@ -58,6 +58,10 @@ export interface Txn {
   icon: string;
   date: string; // ISO YYYY-MM-DD
   amount: number;
+  /** account the money left from (despesa/transferência) or entered (receita) */
+  accountId?: string | null;
+  /** destination account, only for transferências */
+  toAccountId?: string | null;
 }
 
 export type TxnType = 'despesa' | 'receita' | 'transferencia';
@@ -79,6 +83,9 @@ export interface AppState {
   addType: TxnType;
   addCat: string;
   addDesc: string;
+  addDate: string;
+  addAccountId: string | null;
+  addToAccountId: string | null;
   addEditId: string | null;
   newCatOpen: boolean;
   newCatName: string;

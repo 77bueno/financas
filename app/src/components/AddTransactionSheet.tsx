@@ -61,18 +61,88 @@ export function AddTransactionSheet() {
           <button onClick={() => actions.setAddType('transferencia')} style={{ ...segBtnStyle, background: seg.transferencia.bg, color: seg.transferencia.color }}>Transferência</button>
         </div>
 
-        <input
-          value={state.addDesc}
-          onChange={e => actions.setAddDesc(e.target.value)}
-          placeholder={state.addType === 'receita' ? 'Ex.: Salário, freela do mês…' : 'Ex.: Assinatura Claude, faculdade, roupa…'}
-          style={{
-            width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-            borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Sora'", fontSize: 14,
-            outline: 'none', marginBottom: 14,
-          }}
-        />
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+          <input
+            value={state.addDesc}
+            onChange={e => actions.setAddDesc(e.target.value)}
+            placeholder={state.addType === 'receita' ? 'Ex.: Salário, freela do mês…' : 'Ex.: Assinatura Claude, faculdade, roupa…'}
+            style={{
+              flex: 1, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+              borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Sora'", fontSize: 14,
+              outline: 'none',
+            }}
+          />
+          <input
+            type="date"
+            value={state.addDate}
+            onChange={e => actions.setAddDate(e.target.value)}
+            style={{
+              flexShrink: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+              borderRadius: 14, padding: '13px 12px', color: '#C9C5DE', fontFamily: "'Sora'", fontSize: 13,
+              outline: 'none', colorScheme: 'dark',
+            }}
+          />
+        </div>
 
         <AmountField label="Valor" valueStr={derived.amountStr} color={derived.amountColor} onDigits={actions.setCents} />
+
+        {state.accounts.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em', display: 'block', marginBottom: 8 }}>
+              {state.addType === 'receita' ? 'ENTRA NA CONTA' : state.addType === 'transferencia' ? 'SAI DA CONTA' : 'SAI DA CONTA'}
+            </span>
+            <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+              {state.accounts.map(a => {
+                const sel = state.addAccountId === a.id;
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => actions.setAddAccountId(sel ? null : a.id)}
+                    style={{
+                      flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
+                      border: `1px solid ${sel ? '#8E7BFF' : 'rgba(255,255,255,.08)'}`,
+                      background: sel ? 'rgba(142,123,255,.22)' : 'rgba(255,255,255,.04)',
+                      color: sel ? '#fff' : '#C9C5DE',
+                      padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
+                      fontFamily: "'Sora'", fontWeight: 500,
+                    }}
+                  >
+                    {a.icon} {a.name}
+                  </button>
+                );
+              })}
+            </div>
+            {state.addType === 'transferencia' && (
+              <>
+                <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em', display: 'block', margin: '10px 0 8px' }}>ENTRA NA CONTA</span>
+                <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+                  {state.accounts.filter(a => a.id !== state.addAccountId).map(a => {
+                    const sel = state.addToAccountId === a.id;
+                    return (
+                      <button
+                        key={a.id}
+                        onClick={() => actions.setAddToAccountId(sel ? null : a.id)}
+                        style={{
+                          flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
+                          border: `1px solid ${sel ? '#6EE7B0' : 'rgba(255,255,255,.08)'}`,
+                          background: sel ? 'rgba(110,231,176,.18)' : 'rgba(255,255,255,.04)',
+                          color: sel ? '#fff' : '#C9C5DE',
+                          padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
+                          fontFamily: "'Sora'", fontWeight: 500,
+                        }}
+                      >
+                        {a.icon} {a.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            <span style={{ fontSize: 11, color: '#7C7896', display: 'block', marginTop: 6 }}>
+              {state.addAccountId ? 'O saldo da conta atualiza automaticamente.' : 'Sem conta selecionada — os saldos não mudam.'}
+            </span>
+          </div>
+        )}
 
         {state.addType === 'despesa' && (
           <>

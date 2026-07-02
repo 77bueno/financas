@@ -18,6 +18,9 @@ export function createInitialState(): AppState {
     addType: 'despesa',
     addCat: 'Alimentação',
     addDesc: '',
+    addDate: isoDate(new Date()),
+    addAccountId: null,
+    addToAccountId: null,
     addEditId: null,
     newCatOpen: false,
     newCatName: '',
@@ -68,9 +71,9 @@ export function createDemoState(): AppState {
       { id: nextId('debt'), name: 'Financiamento do carro', value: 350 },
     ],
     accounts: [
-      { id: nextId('acc'), icon: '🏦', name: 'Conta corrente', bank: 'Banco Roxo', value: 3740.20, group: 'disp' },
-      { id: nextId('acc'), icon: '💵', name: 'Carteira', bank: 'Dinheiro em espécie', value: 240, group: 'disp' },
-      { id: nextId('acc'), icon: '🐷', name: 'Reserva / Poupança', bank: 'rende 100% CDI', value: 8500, group: 'reserva' },
+      { id: 'acc-demo-cc', icon: '🏦', name: 'Conta corrente', bank: 'Banco Roxo', value: 3740.20, group: 'disp' },
+      { id: 'acc-demo-carteira', icon: '💵', name: 'Carteira', bank: 'Dinheiro em espécie', value: 240, group: 'disp' },
+      { id: 'acc-demo-reserva', icon: '🐷', name: 'Reserva / Poupança', bank: 'rende 100% CDI', value: 8500, group: 'reserva' },
     ],
     investments: [
       { id: nextId('inv'), name: 'Tesouro Selic', value: 12000, cls: 'renda fixa', ret: '+0,9%/mês', good: true, color: '#8E7BFF' },
@@ -90,12 +93,12 @@ export function createDemoState(): AppState {
       { key: ym(1), m: ml(1), v: 46410 },
     ],
     txns: [
-      { id: nextId('txn'), desc: 'Salário', cat: 'Receita', icon: '💰', date: isoDate(now), amount: 5600 },
-      { id: nextId('txn'), desc: 'Mercado Extra', cat: 'Alimentação', icon: '🛒', date: isoDaysAgo(1), amount: -238.90 },
-      { id: nextId('txn'), desc: 'iFood', cat: 'Alimentação', icon: '🍔', date: isoDaysAgo(1), amount: -52.40 },
-      { id: nextId('txn'), desc: 'Uber', cat: 'Transporte', icon: '🚗', date: isoDaysAgo(3), amount: -19.80 },
-      { id: nextId('txn'), desc: 'Netflix', cat: 'Assinaturas', icon: '📺', date: isoDaysAgo(4), amount: -55.90 },
-      { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(6), amount: -1100 },
+      { id: nextId('txn'), desc: 'Salário', cat: 'Receita', icon: '💰', date: isoDate(now), amount: 5600, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Mercado Extra', cat: 'Alimentação', icon: '🛒', date: isoDaysAgo(1), amount: -238.90, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'iFood', cat: 'Alimentação', icon: '🍔', date: isoDaysAgo(1), amount: -52.40, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Uber', cat: 'Transporte', icon: '🚗', date: isoDaysAgo(3), amount: -19.80, accountId: 'acc-demo-carteira' },
+      { id: nextId('txn'), desc: 'Netflix', cat: 'Assinaturas', icon: '📺', date: isoDaysAgo(4), amount: -55.90, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(6), amount: -1100, accountId: 'acc-demo-cc' },
     ],
   };
 }
