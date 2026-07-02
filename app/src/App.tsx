@@ -12,7 +12,7 @@ import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
 import { Toast } from './components/Toast';
 import { TabBar } from './components/TabBar';
-import { SideNav } from './components/SideNav';
+import { TopNav } from './components/TopNav';
 
 function Screen() {
   const { state } = useFinance();
@@ -32,7 +32,7 @@ function Screen() {
 function AppShell() {
   return (
     <div className="app-layout">
-      <SideNav />
+      <TopNav />
       <div className="app-card">
         <div className="fin-scroll app-scroll">
           <div className="content">
