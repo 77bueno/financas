@@ -1,32 +1,20 @@
-# React + TypeScript + Vite
+# Finanças — app
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Código-fonte da plataforma (React 19 + TypeScript + Vite 8 + vite-plugin-pwa).
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # desenvolvimento — http://localhost:5173/financas/
+npm run build      # typecheck + build de produção + service worker
+npm run preview    # serve o build localmente
+npm run lint       # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Documentação completa (fluxos do usuário, arquitetura, modelo de dados, regras de cálculo, PWA e deploy): [`../docs/DOCUMENTACAO.md`](../docs/DOCUMENTACAO.md).
+
+Mapa rápido do código:
+
+- `src/state/` — fonte de verdade: tipos, estado inicial/demo, store (ações + persistência + snapshots mensais) e `derived.ts` (todos os valores calculados exibidos na UI)
+- `src/screens/` — uma tela por arquivo (Home, Spend, Txns/extrato, Invest, Goals, Wealth, Plan, Year, Profile, Onboarding)
+- `src/components/` — header, tab bar, hub do "+", folhas de criar/editar, campo de valor, toast
+- `src/utils/format.ts` — formatação BRL, parsing de dígitos e datas
