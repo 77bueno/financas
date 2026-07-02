@@ -31,27 +31,20 @@ function Screen() {
 
 function AppShell() {
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        background: 'radial-gradient(130% 80% at 50% -10%, #1b1436 0%, #0a0814 60%)',
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      <div className="app-layout">
-        <SideNav />
-        <div className="app-card">
-          <div className="fin-scroll app-scroll">
+    <div className="app-layout">
+      <SideNav />
+      <div className="app-card">
+        <div className="fin-scroll app-scroll">
+          <div className="content">
             <Screen />
           </div>
-
-          <AddTransactionSheet />
-          <ToastGate />
-          <Hub />
-          <QuickAddSheet />
-          <TabBar />
         </div>
+
+        <AddTransactionSheet />
+        <ToastGate />
+        <Hub />
+        <QuickAddSheet />
+        <TabBar />
       </div>
     </div>
   );
