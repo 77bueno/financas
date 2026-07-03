@@ -6,15 +6,21 @@ import { MONTHS_PT, CAT_PALETTE, defaultCategories } from './constants';
 import { nextId, parseDigits, isoDate } from '../utils/format';
 import { computeDerived } from './derived';
 
-const STORAGE_KEY = 'financas-app-state-v3';
+const LEGACY_KEY = 'financas-app-state-v3';
+const dataKey = (userId: string) => `financas-data-v1:${userId}`;
 
-function loadInitial(): AppState {
-  const base = createInitialState();
+function loadInitial(userId: string, accountName: string): AppState {
+  const base = { ...createInitialState(), userName: accountName };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(dataKey(userId));
+    let fromLegacy = false;
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_KEY);
+      fromLegacy = raw !== null;
+    }
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<AppState>;
-      return {
+      const merged: AppState = {
         ...base,
         ...parsed,
         categories: parsed.categories?.length ? parsed.categories : defaultCategories(),
@@ -34,6 +40,9 @@ function loadInitial(): AppState {
         toastMsg: '',
         connecting: false,
       };
+      if (!merged.userName.trim()) merged.userName = accountName;
+      if (fromLegacy) localStorage.removeItem(LEGACY_KEY);
+      return merged;
     }
   } catch {
     // ignore corrupt storage
@@ -60,14 +69,14 @@ function applyTxnToAccounts(accounts: Account[], t: Pick<Txn, 'amount' | 'accoun
   });
 }
 
-function useFinanceState() {
-  const [state, setState] = useState<AppState>(loadInitial);
+function useFinanceState(userId: string, accountName: string) {
+  const [state, setState] = useState<AppState>(() => loadInitial(userId, accountName));
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const connectTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    localStorage.setItem(dataKey(userId), JSON.stringify(state));
+  }, [state, userId]);
 
   useEffect(() => () => {
     clearTimeout(toastTimer.current);
@@ -226,7 +235,13 @@ function useFinanceState() {
   const removeDebt = useCallback((id: string) => setState(p => ({ ...p, debts: p.debts.filter(d => d.id !== id) })), []);
 
   // ---- onboarding ----
-  const startManual = useCallback(() => setState(p => ({ ...p, onbStep: 1 })), []);
+  const startManual = useCallback(() => setState(p => {
+    const step = p.userName.trim() ? 2 : 1;
+    if (step === 2 && p.accounts.length === 0) {
+      return { ...p, onbStep: step, accounts: [{ id: nextId('acc'), icon: '🏦', name: '', bank: 'Conta', value: 0, group: 'disp' as const }] };
+    }
+    return { ...p, onbStep: step };
+  }), []);
   const loadDemo = useCallback(() => {
     setState(p => ({ ...p, connecting: true }));
     clearTimeout(connectTimer.current);
@@ -283,10 +298,10 @@ function useFinanceState() {
         next = { accounts: [...p.accounts, { id: nextId('acc'), icon: reserva ? '🐷' : '🏦', name: name || 'Nova conta', bank: reserva ? 'Guardado' : 'Conta', value: val, group: p.quickGroup }] };
         msg = '✓ Conta adicionada';
       } else if (kind === 'cofrinho') {
-        next = { goals: [...p.goals, { id: nextId('goal'), icon: '🐷', name: name || 'Novo cofrinho', sub: 'Meta', saved: 0, target: val || 1000, color: '#8E7BFF' }] };
+        next = { goals: [...p.goals, { id: nextId('goal'), icon: '🐷', name: name || 'Novo cofrinho', sub: 'Meta', saved: 0, target: val || 1000, color: '#10B981' }] };
         msg = '✓ Cofrinho criado';
       } else if (kind === 'investimento') {
-        next = { investments: [...p.investments, { id: nextId('inv'), name: name || 'Novo aporte', value: val, cls: 'aporte', ret: '—', good: true, color: '#6EE7B0' }] };
+        next = { investments: [...p.investments, { id: nextId('inv'), name: name || 'Novo aporte', value: val, cls: 'aporte', ret: '—', good: true, color: '#34D399' }] };
         msg = '✓ Investimento adicionado';
       }
       return { ...p, ...next, quickOpen: false, toast: true, toastMsg: msg };
@@ -354,9 +369,9 @@ function useFinanceState() {
   }, []);
 
   const resetAll = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setState(createInitialState());
-  }, []);
+    localStorage.removeItem(dataKey(userId));
+    setState({ ...createInitialState(), userName: accountName });
+  }, [userId, accountName]);
 
   const setInvestPct = useCallback((v: number) => setState(p => ({ ...p, investPct: v })), []);
   const setAddType = useCallback((t: TxnType) => setState(p => ({ ...p, addType: t })), []);
@@ -440,8 +455,8 @@ type FinanceContextValue = ReturnType<typeof useFinanceState>;
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
 
-export function FinanceProvider({ children }: { children: ReactNode }) {
-  const value = useFinanceState();
+export function FinanceProvider({ userId, userName, children }: { userId: string; userName: string; children: ReactNode }) {
+  const value = useFinanceState(userId, userName);
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;
 }
 

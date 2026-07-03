@@ -1,7 +1,7 @@
 import type { AppState, Category } from './types';
 import { fmt, dateLabel } from '../utils/format';
 
-const FALLBACK_CAT: Omit<Category, 'id' | 'name'> = { icon: '💸', color: '#5E4BA0', bg: 'rgba(94,75,160,.16)' };
+const FALLBACK_CAT: Omit<Category, 'id' | 'name'> = { icon: '💸', color: '#94A3B8', bg: 'rgba(148,163,184,.16)' };
 
 export function computeDerived(state: AppState) {
   const S = state.salary;
@@ -78,8 +78,8 @@ export function computeDerived(state: AppState) {
     return {
       m: d.m,
       h: (maxYear > 0 ? (d.v / maxYear) * 80 + 12 : 12) + '%',
-      barBg: last ? 'linear-gradient(#B9A6FF,#8E7BFF)' : 'rgba(142,123,255,.4)',
-      labelColor: last ? '#B9A6FF' : '#7C7896',
+      barBg: last ? 'linear-gradient(#34D399,#10B981)' : 'rgba(16,185,129,.4)',
+      labelColor: last ? '#34D399' : '#6B7280',
     };
   });
   const hasHistory = yd.length >= 2;
@@ -107,7 +107,7 @@ export function computeDerived(state: AppState) {
       sub: `${t.cat} · ${dateLabel(t.date)}${accLabel}`,
       date: t.date,
       amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
-      color: t.amount < 0 ? '#FF8FB3' : '#6EE7B0',
+      color: t.amount < 0 ? '#F87171' : '#34D399',
       isExpense: t.amount < 0,
     };
   };
@@ -147,7 +147,7 @@ export function computeDerived(state: AppState) {
     dailyStr: fmt(dailyV),
     salaryFmt: fmt(S),
     commitPct: commit + '%',
-    commitColor: commit > 40 ? '#FF8FB3' : commit > 30 ? '#E8B96A' : '#6EE7B0',
+    commitColor: commit > 40 ? '#F87171' : commit > 30 ? '#FBBF24' : '#34D399',
     commitMsg: commit > 40 ? 'Comprometimento alto — corte dívidas' : commit > 30 ? 'Dá pra melhorar um pouco' : 'Comprometimento saudável',
     barDebtW: w(D),
     barInvestW: w(investV),
@@ -173,7 +173,7 @@ export function computeDerived(state: AppState) {
       valueStr: fmt(iv.value),
       cls: Math.round((iv.value / (investedTotal || 1)) * 100) + '% · ' + iv.cls,
       ret: iv.ret,
-      retColor: iv.good ? '#6EE7B0' : '#FF8FB3',
+      retColor: iv.good ? '#34D399' : '#F87171',
       color: iv.color,
     })),
     goalRows: state.goals.map(g => {
@@ -195,7 +195,7 @@ export function computeDerived(state: AppState) {
     txnRows: state.txns.map(toTxnRow),
 
     amountStr: fmt(state.cents / 100),
-    amountColor: state.addType === 'receita' ? '#6EE7B0' : state.addType === 'transferencia' ? '#E8B96A' : '#FF8FB3',
+    amountColor: state.addType === 'receita' ? '#34D399' : state.addType === 'transferencia' ? '#FBBF24' : '#F87171',
     quickAmountStr: fmt(state.quickCents / 100),
     editAmountStr: fmt(state.editCents / 100),
     editAmount2Str: fmt(state.editCents2 / 100),

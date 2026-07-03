@@ -12,12 +12,12 @@ export function QuickAddSheet() {
     <div style={{ position: 'absolute', inset: 0, zIndex: 21 }}>
       <div
         onClick={actions.closeQuick}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(4,2,12,.6)', backdropFilter: 'blur(2px)', animation: 'fadeIn .2s both' }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(2px)', animation: 'fadeIn .2s both' }}
       />
       <div
         className="sheet"
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#15112b',
+          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#14171C',
           borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
         }}
@@ -27,7 +27,7 @@ export function QuickAddSheet() {
           <strong style={{ fontSize: 17, color: '#fff', fontWeight: 600 }}>{QUICK_TITLE[kind] ?? ''}</strong>
           <button
             onClick={actions.closeQuick}
-            style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C9C5DE', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
+            style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C3C9D2', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
           >
             ✕
           </button>
@@ -38,9 +38,9 @@ export function QuickAddSheet() {
             <button
               onClick={() => actions.setQuickGroup('disp')}
               style={{
-                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
-                background: state.quickGroup === 'disp' ? '#8E7BFF' : 'transparent',
-                color: state.quickGroup === 'disp' ? '#fff' : '#9C97B8',
+                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+                background: state.quickGroup === 'disp' ? '#10B981' : 'transparent',
+                color: state.quickGroup === 'disp' ? '#fff' : '#9AA3AF',
               }}
             >
               💳 Disponível
@@ -48,9 +48,9 @@ export function QuickAddSheet() {
             <button
               onClick={() => actions.setQuickGroup('reserva')}
               style={{
-                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
-                background: state.quickGroup === 'reserva' ? '#6EE7B0' : 'transparent',
-                color: state.quickGroup === 'reserva' ? '#08321f' : '#9C97B8',
+                flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+                background: state.quickGroup === 'reserva' ? '#34D399' : 'transparent',
+                color: state.quickGroup === 'reserva' ? '#052E1B' : '#9AA3AF',
               }}
             >
               🐷 Guardado
@@ -65,7 +65,7 @@ export function QuickAddSheet() {
           autoFocus
           style={{
             width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-            borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Sora'", fontSize: 14,
+            borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Inter'", fontSize: 14,
             outline: 'none', marginBottom: 16,
           }}
         />
@@ -75,9 +75,9 @@ export function QuickAddSheet() {
         <button
           onClick={actions.saveQuick}
           style={{
-            width: '100%', padding: 15, background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)', border: 'none',
-            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
-            boxShadow: '0 10px 24px -6px rgba(142,123,255,.6)',
+            width: '100%', padding: 15, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
+            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+            boxShadow: '0 10px 24px -6px rgba(16,185,129,.6)',
           }}
         >
           Salvar

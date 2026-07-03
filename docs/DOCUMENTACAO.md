@@ -30,11 +30,13 @@ Plataforma de organização financeira pessoal: contas, gastos com descrição l
 |---|---|
 | **Stack** | React 19 + TypeScript + Vite 8 |
 | **Estado** | React Context + `useState`, sem bibliotecas externas |
-| **Persistência** | `localStorage` do navegador (chave `financas-app-state-v3`) |
+| **Persistência** | `localStorage` do navegador, por perfil (`financas-data-v1:<userId>`) |
 | **Estilo** | CSS-in-JS inline + um `index.css` global (breakpoints, animações) |
 | **PWA** | `vite-plugin-pwa` (service worker com cache offline, manifest, ícones) |
 | **Deploy** | GitHub Actions → GitHub Pages, automático a cada push na `main` |
-| **Backend** | Não há. Tudo roda e fica no dispositivo do usuário. |
+| **Backend** | Não há. Tudo roda e fica no dispositivo; login/senha são locais (ver §2 e §8). |
+
+**Identidade visual (v5):** grafite profundo `#0B0D10` + verde-esmeralda `#10B981` como cor primária; superfícies planas `#14171C` com borda sutil; tipografia **Inter** (UI) + **Space Grotesk** (valores); ícones **SVG próprios** em toda a interface — emojis aparecem apenas como conteúdo escolhido pelo usuário (ícones de categoria). Verde = entrada/positivo, vermelho suave = saída/negativo, âmbar = atenção.
 
 **Princípios do produto:**
 
@@ -58,6 +60,17 @@ Depois de instalado, o app abre em janela própria (sem barra do navegador), tem
 
 > **Atualizações:** a cada deploy o service worker baixa a versão nova em segundo plano e a aplica na recarga seguinte (`registerType: autoUpdate`). Se uma mudança não aparecer, recarregue com `Ctrl/Cmd+Shift+R`.
 
+### Conta e login
+
+O acesso é protegido por conta com senha:
+
+- **Criar conta**: nome + e-mail + senha (mín. 6 caracteres). A senha é guardada como hash **PBKDF2-SHA256 (150k iterações) com salt** — nunca em texto puro.
+- **Código de recuperação**: exibido uma única vez ao criar a conta. É a única forma de redefinir a senha ("Esqueci a senha" = e-mail + código → nova senha + novo código). Guarde-o.
+- **Trocar senha** (com a senha atual) e **Sair** ficam no Perfil.
+- **Vários perfis** podem coexistir no mesmo dispositivo — cada um com seus próprios dados, isolados por usuário.
+
+> **Importante — autenticação local**: não há servidor; contas, senhas (hasheadas) e dados vivem no navegador do dispositivo. Isso protege contra uso casual do aparelho, mas não substitui um backend com sincronização — que é o próximo grande passo do roadmap. A arquitetura (AuthProvider separado) já isola essa troca.
+
 ---
 
 ## 3. Fluxos do usuário
@@ -66,15 +79,15 @@ Depois de instalado, o app abre em janela própria (sem barra do navegador), tem
 
 ```mermaid
 flowchart TD
-    A[Tela de boas-vindas] -->|"✍️ Começar do zero"| B["Passo 1 · Seu nome"]
-    A -->|"🔎 Explorar com dados de exemplo"| D[Carrega dataset demo 'Larissa'] --> H[Painel Início]
+    L[Login / Criar conta] --> A[Tela de boas-vindas]
+    A -->|"Começar do zero"| C["Contas e saldos<br>(quantas quiser)"]
+    A -->|"Explorar com dados de exemplo"| D[Carrega dataset demo 'Larissa'] --> H[Painel Início]
     A -->|"Pular por agora"| H
-    B --> C["Passo 2 · Contas e saldos<br>(quantas quiser, + Adicionar conta)"]
-    C --> E["Passo 3 · Salário mensal"]
+    C --> E["Salário mensal"]
     E --> F["Tudo pronto! ✓"] --> H
 ```
 
-- Cada passo tem botão **‹ voltar**.
+- O nome vem da conta criada no login (o passo de nome só aparece se estiver vazio). Cada passo tem botão **‹ voltar**.
 - Contas deixadas totalmente em branco no passo 2 são descartadas ao concluir.
 - O nome é usado na saudação ("Bom dia, …"), no avatar (inicial) e pode ser trocado depois no perfil.
 
@@ -319,7 +332,11 @@ Todas implementadas em [`app/src/state/derived.ts`](../app/src/state/derived.ts)
 
 ## 8. Persistência e privacidade
 
-- **Onde:** `localStorage` do navegador, chave `financas-app-state-v3`. Nenhum dado sai do dispositivo; não há servidor, conta ou login.
+- **Onde:** `localStorage` do navegador. Nenhum dado sai do dispositivo.
+  - `financas-users-v1` — registro de contas (nome, e-mail, hashes de senha/código).
+  - `financas-session-v1` — sessão ativa.
+  - `financas-data-v1:<userId>` — dados financeiros de cada perfil.
+  - Dados da versão anterior (`financas-app-state-v3`) são migrados automaticamente para o primeiro perfil que fizer login.
 - **Quando:** a cada mudança de estado (efeito no store).
 - **Versão:** a chave é versionada (`-v3`). Mudanças estruturais incompatíveis trocam a versão — o app então recomeça zerado (dados antigos permanecem órfãos na chave anterior).
 - **Reset:** "Apagar todos os dados" no perfil remove a chave e volta ao onboarding.

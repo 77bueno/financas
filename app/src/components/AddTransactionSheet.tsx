@@ -4,7 +4,7 @@ import { AmountField } from './AmountField';
 
 const segBtnStyle: React.CSSProperties = {
   flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600,
-  cursor: 'pointer', fontFamily: "'Sora'",
+  cursor: 'pointer', fontFamily: "'Inter'",
 };
 
 export function AddTransactionSheet() {
@@ -14,21 +14,21 @@ export function AddTransactionSheet() {
   const editing = state.addEditId !== null;
 
   const seg = {
-    despesa: { bg: state.addType === 'despesa' ? '#8E7BFF' : 'transparent', color: state.addType === 'despesa' ? '#fff' : '#9C97B8' },
-    receita: { bg: state.addType === 'receita' ? '#6EE7B0' : 'transparent', color: state.addType === 'receita' ? '#08321f' : '#9C97B8' },
-    transferencia: { bg: state.addType === 'transferencia' ? '#E8B96A' : 'transparent', color: state.addType === 'transferencia' ? '#3a2b06' : '#9C97B8' },
+    despesa: { bg: state.addType === 'despesa' ? '#10B981' : 'transparent', color: state.addType === 'despesa' ? '#fff' : '#9AA3AF' },
+    receita: { bg: state.addType === 'receita' ? '#34D399' : 'transparent', color: state.addType === 'receita' ? '#052E1B' : '#9AA3AF' },
+    transferencia: { bg: state.addType === 'transferencia' ? '#FBBF24' : 'transparent', color: state.addType === 'transferencia' ? '#451A03' : '#9AA3AF' },
   };
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 20 }}>
       <div
         onClick={actions.closeAdd}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(4,2,12,.6)', backdropFilter: 'blur(2px)', animation: 'fadeIn .2s both' }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(2px)', animation: 'fadeIn .2s both' }}
       />
       <div
         className="sheet fin-scroll"
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#15112b',
+          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#14171C',
           borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
           maxHeight: '88%', overflowY: 'auto',
@@ -41,14 +41,14 @@ export function AddTransactionSheet() {
             {editing && (
               <button
                 onClick={() => actions.deleteTxn(state.addEditId!)}
-                style={{ background: 'rgba(255,143,179,.12)', border: '1px solid rgba(255,143,179,.3)', color: '#FF8FB3', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'" }}
+                style={{ background: 'rgba(248,113,113,.12)', border: '1px solid rgba(248,113,113,.3)', color: '#F87171', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
               >
                 Excluir
               </button>
             )}
             <button
               onClick={actions.closeAdd}
-              style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C9C5DE', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
+              style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C3C9D2', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
             >
               ✕
             </button>
@@ -68,7 +68,7 @@ export function AddTransactionSheet() {
             placeholder={state.addType === 'receita' ? 'Ex.: Salário, freela do mês…' : 'Ex.: Assinatura Claude, faculdade, roupa…'}
             style={{
               flex: 1, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-              borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Sora'", fontSize: 14,
+              borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Inter'", fontSize: 14,
               outline: 'none',
             }}
           />
@@ -78,7 +78,7 @@ export function AddTransactionSheet() {
             onChange={e => actions.setAddDate(e.target.value)}
             style={{
               flexShrink: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-              borderRadius: 14, padding: '13px 12px', color: '#C9C5DE', fontFamily: "'Sora'", fontSize: 13,
+              borderRadius: 14, padding: '13px 12px', color: '#C3C9D2', fontFamily: "'Inter'", fontSize: 13,
               outline: 'none', colorScheme: 'dark',
             }}
           />
@@ -88,7 +88,7 @@ export function AddTransactionSheet() {
 
         {state.accounts.length > 0 && (
           <div style={{ marginBottom: 14 }}>
-            <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em', display: 'block', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em', display: 'block', marginBottom: 8 }}>
               {state.addType === 'receita' ? 'ENTRA NA CONTA' : state.addType === 'transferencia' ? 'SAI DA CONTA' : 'SAI DA CONTA'}
             </span>
             <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
@@ -100,11 +100,11 @@ export function AddTransactionSheet() {
                     onClick={() => actions.setAddAccountId(sel ? null : a.id)}
                     style={{
                       flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-                      border: `1px solid ${sel ? '#8E7BFF' : 'rgba(255,255,255,.08)'}`,
-                      background: sel ? 'rgba(142,123,255,.22)' : 'rgba(255,255,255,.04)',
-                      color: sel ? '#fff' : '#C9C5DE',
+                      border: `1px solid ${sel ? '#10B981' : 'rgba(255,255,255,.08)'}`,
+                      background: sel ? 'rgba(16,185,129,.22)' : 'rgba(255,255,255,.04)',
+                      color: sel ? '#fff' : '#C3C9D2',
                       padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
-                      fontFamily: "'Sora'", fontWeight: 500,
+                      fontFamily: "'Inter'", fontWeight: 500,
                     }}
                   >
                     {a.icon} {a.name}
@@ -114,7 +114,7 @@ export function AddTransactionSheet() {
             </div>
             {state.addType === 'transferencia' && (
               <>
-                <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em', display: 'block', margin: '10px 0 8px' }}>ENTRA NA CONTA</span>
+                <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em', display: 'block', margin: '10px 0 8px' }}>ENTRA NA CONTA</span>
                 <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
                   {state.accounts.filter(a => a.id !== state.addAccountId).map(a => {
                     const sel = state.addToAccountId === a.id;
@@ -124,11 +124,11 @@ export function AddTransactionSheet() {
                         onClick={() => actions.setAddToAccountId(sel ? null : a.id)}
                         style={{
                           flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-                          border: `1px solid ${sel ? '#6EE7B0' : 'rgba(255,255,255,.08)'}`,
-                          background: sel ? 'rgba(110,231,176,.18)' : 'rgba(255,255,255,.04)',
-                          color: sel ? '#fff' : '#C9C5DE',
+                          border: `1px solid ${sel ? '#34D399' : 'rgba(255,255,255,.08)'}`,
+                          background: sel ? 'rgba(52,211,153,.18)' : 'rgba(255,255,255,.04)',
+                          color: sel ? '#fff' : '#C3C9D2',
                           padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
-                          fontFamily: "'Sora'", fontWeight: 500,
+                          fontFamily: "'Inter'", fontWeight: 500,
                         }}
                       >
                         {a.icon} {a.name}
@@ -138,7 +138,7 @@ export function AddTransactionSheet() {
                 </div>
               </>
             )}
-            <span style={{ fontSize: 11, color: '#7C7896', display: 'block', marginTop: 6 }}>
+            <span style={{ fontSize: 11, color: '#6B7280', display: 'block', marginTop: 6 }}>
               {state.addAccountId ? 'O saldo da conta atualiza automaticamente.' : 'Sem conta selecionada — os saldos não mudam.'}
             </span>
           </div>
@@ -147,10 +147,10 @@ export function AddTransactionSheet() {
         {state.addType === 'despesa' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 12, color: '#9C97B8', letterSpacing: '.04em' }}>CATEGORIA</span>
+              <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em' }}>CATEGORIA</span>
               <button
                 onClick={actions.toggleNewCat}
-                style={{ background: 'none', border: 'none', color: '#B9A6FF', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'" }}
+                style={{ background: 'none', border: 'none', color: '#34D399', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
               >
                 {state.newCatOpen ? 'cancelar' : '+ nova categoria'}
               </button>
@@ -165,7 +165,7 @@ export function AddTransactionSheet() {
                   autoFocus
                   style={{
                     width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-                    borderRadius: 12, padding: '11px 13px', color: '#fff', fontFamily: "'Sora'", fontSize: 13.5, outline: 'none',
+                    borderRadius: 12, padding: '11px 13px', color: '#fff', fontFamily: "'Inter'", fontSize: 13.5, outline: 'none',
                   }}
                 />
                 <div className="fin-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
@@ -175,8 +175,8 @@ export function AddTransactionSheet() {
                       onClick={() => actions.setNewCatIcon(e)}
                       style={{
                         flexShrink: 0, width: 38, height: 38, borderRadius: 11, fontSize: 18, cursor: 'pointer',
-                        background: state.newCatIcon === e ? 'rgba(142,123,255,.3)' : 'rgba(255,255,255,.05)',
-                        border: state.newCatIcon === e ? '1px solid #8E7BFF' : '1px solid rgba(255,255,255,.08)',
+                        background: state.newCatIcon === e ? 'rgba(16,185,129,.3)' : 'rgba(255,255,255,.05)',
+                        border: state.newCatIcon === e ? '1px solid #10B981' : '1px solid rgba(255,255,255,.08)',
                       }}
                     >
                       {e}
@@ -185,7 +185,7 @@ export function AddTransactionSheet() {
                 </div>
                 <button
                   onClick={actions.saveNewCat}
-                  style={{ width: '100%', padding: 11, background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)', border: 'none', borderRadius: 12, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'" }}
+                  style={{ width: '100%', padding: 11, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none', borderRadius: 12, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
                 >
                   Criar categoria
                 </button>
@@ -202,9 +202,9 @@ export function AddTransactionSheet() {
                         flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
                         border: `1px solid ${sel ? c.color : 'rgba(255,255,255,.08)'}`,
                         background: sel ? c.bg : 'rgba(255,255,255,.04)',
-                        color: sel ? '#fff' : '#C9C5DE',
+                        color: sel ? '#fff' : '#C3C9D2',
                         padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
-                        fontFamily: "'Sora'", fontWeight: 500,
+                        fontFamily: "'Inter'", fontWeight: 500,
                       }}
                     >
                       {c.icon} {c.name}
@@ -219,9 +219,9 @@ export function AddTransactionSheet() {
         <button
           onClick={actions.save}
           style={{
-            width: '100%', padding: 15, background: 'linear-gradient(135deg,#8E7BFF,#5E3EE0)', border: 'none',
-            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora'",
-            boxShadow: '0 10px 24px -6px rgba(142,123,255,.6)',
+            width: '100%', padding: 15, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
+            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+            boxShadow: '0 10px 24px -6px rgba(16,185,129,.6)',
           }}
         >
           {editing ? 'Salvar alterações' : 'Salvar transação'}

@@ -2,26 +2,26 @@ import type { Category } from './types';
 
 /** palette pairs assigned to user-created categories, in rotation */
 export const CAT_PALETTE: Array<{ color: string; bg: string }> = [
-  { color: '#E8B96A', bg: 'rgba(232,185,106,.16)' },
-  { color: '#8E7BFF', bg: 'rgba(142,123,255,.16)' },
-  { color: '#FF8FB3', bg: 'rgba(255,143,179,.16)' },
-  { color: '#6EE7B0', bg: 'rgba(110,231,176,.16)' },
-  { color: '#B9A6FF', bg: 'rgba(185,166,255,.16)' },
-  { color: '#FF6E9C', bg: 'rgba(255,110,156,.16)' },
-  { color: '#5E4BA0', bg: 'rgba(94,75,160,.16)' },
+  { color: '#FBBF24', bg: 'rgba(251,191,36,.14)' },
+  { color: '#38BDF8', bg: 'rgba(56,189,248,.14)' },
+  { color: '#FB7185', bg: 'rgba(251,113,133,.14)' },
+  { color: '#A78BFA', bg: 'rgba(167,139,250,.14)' },
+  { color: '#34D399', bg: 'rgba(52,211,153,.14)' },
+  { color: '#F472B6', bg: 'rgba(244,114,182,.14)' },
+  { color: '#94A3B8', bg: 'rgba(148,163,184,.14)' },
 ];
 
 export const CAT_EMOJIS = ['🎓', '📱', '👕', '🎮', '✈️', '🏋️', '🐶', '🎁', '☕', '💼', '🧾', '💊', '🍽️', '🚗', '🏠', '🎬', '📺', '💸'];
 
 export function defaultCategories(): Category[] {
   return [
-    { id: 'cat-alimentacao', name: 'Alimentação', icon: '🍽️', color: '#E8B96A', bg: 'rgba(232,185,106,.16)' },
-    { id: 'cat-transporte', name: 'Transporte', icon: '🚗', color: '#8E7BFF', bg: 'rgba(142,123,255,.16)' },
-    { id: 'cat-moradia', name: 'Moradia', icon: '🏠', color: '#FF8FB3', bg: 'rgba(255,143,179,.16)' },
-    { id: 'cat-lazer', name: 'Lazer', icon: '🎬', color: '#B9A6FF', bg: 'rgba(185,166,255,.16)' },
-    { id: 'cat-saude', name: 'Saúde', icon: '💊', color: '#6EE7B0', bg: 'rgba(110,231,176,.16)' },
-    { id: 'cat-assinaturas', name: 'Assinaturas', icon: '📺', color: '#FF6E9C', bg: 'rgba(255,110,156,.16)' },
-    { id: 'cat-outros', name: 'Outros', icon: '💸', color: '#5E4BA0', bg: 'rgba(94,75,160,.16)' },
+    { id: 'cat-alimentacao', name: 'Alimentação', icon: '🍽️', color: '#FBBF24', bg: 'rgba(251,191,36,.14)' },
+    { id: 'cat-transporte', name: 'Transporte', icon: '🚗', color: '#38BDF8', bg: 'rgba(56,189,248,.14)' },
+    { id: 'cat-moradia', name: 'Moradia', icon: '🏠', color: '#FB7185', bg: 'rgba(251,113,133,.14)' },
+    { id: 'cat-lazer', name: 'Lazer', icon: '🎬', color: '#A78BFA', bg: 'rgba(167,139,250,.14)' },
+    { id: 'cat-saude', name: 'Saúde', icon: '💊', color: '#34D399', bg: 'rgba(52,211,153,.14)' },
+    { id: 'cat-assinaturas', name: 'Assinaturas', icon: '📺', color: '#F472B6', bg: 'rgba(244,114,182,.14)' },
+    { id: 'cat-outros', name: 'Outros', icon: '💸', color: '#94A3B8', bg: 'rgba(148,163,184,.14)' },
   ];
 }
 

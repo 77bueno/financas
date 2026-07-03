@@ -1,4 +1,6 @@
 import { FinanceProvider, useFinance } from './state/store';
+import { AuthProvider, useAuth } from './auth/authStore';
+import { Auth } from './screens/Auth';
 import { Onboarding } from './screens/Onboarding';
 import { Home } from './screens/Home';
 import { Spend } from './screens/Spend';
@@ -61,11 +63,21 @@ function ToastGate() {
   return <Toast show={state.toast} msg={state.toastMsg} />;
 }
 
-function App() {
+function Gate() {
+  const { session } = useAuth();
+  if (!session) return <Auth />;
   return (
-    <FinanceProvider>
+    <FinanceProvider key={session.id} userId={session.id} userName={session.name}>
       <AppShell />
     </FinanceProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
   );
 }
 
