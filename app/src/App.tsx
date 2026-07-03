@@ -12,6 +12,7 @@ import { Year } from './screens/Year';
 import { Profile } from './screens/Profile';
 import { Txns } from './screens/Txns';
 import { EditSheet } from './components/EditSheet';
+import { BudgetSheet } from './components/BudgetSheet';
 import { AddTransactionSheet } from './components/AddTransactionSheet';
 import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
@@ -52,6 +53,7 @@ function AppShell() {
         <Hub />
         <QuickAddSheet />
         <EditSheet />
+        <BudgetSheet />
         <TabBar />
       </div>
     </div>

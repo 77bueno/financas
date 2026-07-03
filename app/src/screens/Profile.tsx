@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useFinance } from '../state/store';
 import { useAuth } from '../auth/authStore';
 import { Icon } from '../components/Icon';
@@ -22,6 +22,19 @@ export function Profile() {
   const [curPass, setCurPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [passMsg, setPassMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [importErr, setImportErr] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onImportFile = (f: File | undefined) => {
+    setImportErr('');
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const r = actions.importData(String(reader.result ?? ''));
+      if (!r.ok) setImportErr(r.error ?? 'Arquivo inválido.');
+    };
+    reader.readAsText(f);
+  };
   const initial = (state.userName.trim()[0] || '•').toUpperCase();
 
   const doChangePassword = async () => {
@@ -173,6 +186,64 @@ export function Profile() {
       </div>
 
       {/* dados */}
+      {/* recorrências */}
+      <div style={cardStyle}>
+        <strong style={{ fontSize: 14.5, color: '#EDEFF2', fontWeight: 600 }}>Recorrências mensais</strong>
+        {derived.recRows.length === 0 ? (
+          <span style={{ fontSize: 12.5, color: '#9AA3AF', lineHeight: 1.5 }}>
+            Nenhuma ainda. Ao registrar uma transação, marque <strong style={{ color: '#EDEFF2' }}>"Repetir todo mês"</strong> — assinaturas e contas fixas se lançam sozinhas.
+          </span>
+        ) : (
+          derived.recRows.map(r => (
+            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{r.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: '#EDEFF2', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.desc}</div>
+                <div style={{ fontSize: 11, color: '#6B7280' }}>{r.cat} · todo dia {r.day}</div>
+              </div>
+              <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: r.color, flexShrink: 0 }}>{r.amountStr}</span>
+              <button
+                onClick={() => actions.deleteRecurrence(r.id)}
+                title="Cancelar recorrência"
+                style={{ background: 'rgba(255,255,255,.06)', border: 'none', color: '#6B7280', width: 26, height: 26, borderRadius: 8, fontSize: 12, cursor: 'pointer', flexShrink: 0 }}
+              >
+                ✕
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* backup */}
+      <div style={cardStyle}>
+        <strong style={{ fontSize: 14.5, color: '#EDEFF2', fontWeight: 600 }}>Backup</strong>
+        <span style={{ fontSize: 12.5, color: '#9AA3AF', lineHeight: 1.5 }}>
+          Baixe um arquivo com todos os seus dados — serve de backup e pra migrar de dispositivo.
+        </span>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={actions.exportData}
+            style={{ flex: 1, padding: 12, background: 'rgba(52,211,153,.1)', border: '1px solid rgba(52,211,153,.3)', borderRadius: 12, color: '#34D399', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+          >
+            Exportar dados
+          </button>
+          <button
+            onClick={() => fileRef.current?.click()}
+            style={{ flex: 1, padding: 12, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 12, color: '#C3C9D2', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+          >
+            Importar backup
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json"
+            style={{ display: 'none' }}
+            onChange={e => { onImportFile(e.target.files?.[0]); e.target.value = ''; }}
+          />
+        </div>
+        {importErr && <span style={{ fontSize: 12.5, color: '#FCA5A5' }}>{importErr}</span>}
+      </div>
+
       <div style={cardStyle}>
         <strong style={{ fontSize: 14.5, color: '#EDEFF2', fontWeight: 600 }}>Meus dados</strong>
         <span style={{ fontSize: 12.5, color: '#9AA3AF', lineHeight: 1.5 }}>

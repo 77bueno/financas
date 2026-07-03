@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { AppState, Screen, TxnType, AccountGroup, EditKind, Txn, Account } from './types';
+import type { AppState, Screen, TxnType, AccountGroup, EditKind, Txn, Account, Recurrence } from './types';
 import { createInitialState, createDemoState } from './initialState';
 import { MONTHS_PT, CAT_PALETTE, defaultCategories } from './constants';
 import { nextId, parseDigits, isoDate } from '../utils/format';
@@ -32,6 +32,9 @@ function loadInitial(userId: string, accountName: string): AppState {
         addOpen: false,
         addDesc: '',
         addEditId: null,
+        addRecurring: false,
+        spendMonth: null,
+        budgetCat: null,
         newCatOpen: false,
         editKind: null,
         editId: null,
@@ -105,6 +108,37 @@ function useFinanceState(userId: string, accountName: string) {
     });
   }, [patrimonio, state.screen]);
 
+  // auto-post monthly recurrences that are due and not yet posted this month
+  useEffect(() => {
+    if (state.screen === 'onboard' || state.recurrences.length === 0) return;
+    const now = new Date();
+    const ym = monthKey(now);
+    const today = now.getDate();
+    setState(p => {
+      const due = p.recurrences.filter(r =>
+        r.day <= today && !p.txns.some(t => t.recId === r.id && t.date.startsWith(ym)));
+      if (due.length === 0) return p;
+      let accounts = p.accounts;
+      const posted: Txn[] = due.map(r => {
+        const tx: Txn = {
+          id: nextId('txn'), desc: r.desc, cat: r.cat, icon: r.icon,
+          date: `${ym}-${String(r.day).padStart(2, '0')}`,
+          amount: r.amount, accountId: r.accountId ?? null, toAccountId: null, recId: r.id,
+        };
+        accounts = applyTxnToAccounts(accounts, tx, 1);
+        return tx;
+      });
+      const txns = [...posted, ...p.txns].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+      return {
+        ...p, accounts, txns, toast: true,
+        toastMsg: due.length === 1 ? `↻ Recorrência lançada: ${due[0].desc}` : `↻ ${due.length} recorrências lançadas`,
+      };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 2600);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.screen, state.recurrences.length]);
+
   const flashToast = useCallback((msg: string) => {
     setState(p => ({ ...p, toast: true, toastMsg: msg }));
     clearTimeout(toastTimer.current);
@@ -121,6 +155,7 @@ function useFinanceState(userId: string, accountName: string) {
   // ---- transactions (create / edit / delete) ----
   const freshAdd = (p: AppState): AppState => ({
     ...p, addOpen: true, addEditId: null, addDesc: '', cents: 0, addType: 'despesa' as const, newCatOpen: false,
+    addRecurring: false,
     addDate: isoDate(new Date()),
     addAccountId: p.accounts.find(a => a.group === 'disp')?.id ?? p.accounts[0]?.id ?? null,
     addToAccountId: null,
@@ -183,10 +218,21 @@ function useFinanceState(userId: string, accountName: string) {
         };
       }
 
-      const tx: Txn = { id: nextId('txn'), desc, date: p.addDate, accountId, toAccountId, ...base };
+      let recurrences = p.recurrences;
+      let recId: string | null = null;
+      if (p.addRecurring && type !== 'transferencia') {
+        const day = Math.min(parseInt(p.addDate.slice(8, 10), 10) || 1, 28);
+        const rec: Recurrence = { id: nextId('rec'), desc, cat: base.cat, icon: base.icon, amount: base.amount, accountId, day };
+        recurrences = [...p.recurrences, rec];
+        recId = rec.id;
+      }
+      const tx: Txn = { id: nextId('txn'), desc, date: p.addDate, accountId, toAccountId, recId, ...base };
       const accounts = applyTxnToAccounts(p.accounts, tx, 1);
       const txns = [tx, ...p.txns].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-      return { ...p, accounts, txns, addOpen: false, addDesc: '', cents: 0, toast: true, toastMsg: '✓ Transação adicionada' };
+      return {
+        ...p, accounts, txns, recurrences, addOpen: false, addDesc: '', cents: 0, addRecurring: false,
+        toast: true, toastMsg: recId ? '✓ Adicionada · repete todo mês' : '✓ Transação adicionada',
+      };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
@@ -368,6 +414,73 @@ function useFinanceState(userId: string, accountName: string) {
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
 
+  const toggleAddRecurring = useCallback(() => setState(p => ({ ...p, addRecurring: !p.addRecurring })), []);
+  const deleteRecurrence = useCallback((id: string) => {
+    setState(p => ({ ...p, recurrences: p.recurrences.filter(r => r.id !== id), toast: true, toastMsg: '✓ Recorrência cancelada' }));
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  const setSpendMonth = useCallback((ym: string | null) => setState(p => ({ ...p, spendMonth: ym })), []);
+
+  const openBudget = useCallback((cat: string) => {
+    setState(p => {
+      const c = p.categories.find(x => x.name === cat);
+      return { ...p, budgetCat: cat, budgetCents: Math.round(((c?.budget ?? 0) * 100)) };
+    });
+  }, []);
+  const closeBudget = useCallback(() => setState(p => ({ ...p, budgetCat: null })), []);
+  const setBudgetCents = useCallback((v: string) => setState(p => ({ ...p, budgetCents: Math.min(parseDigits(v), 999999999) })), []);
+  const saveBudget = useCallback(() => {
+    setState(p => {
+      if (!p.budgetCat) return p;
+      const val = p.budgetCents / 100;
+      return {
+        ...p,
+        categories: p.categories.map(c => c.name === p.budgetCat ? { ...c, budget: val > 0 ? val : undefined } : c),
+        budgetCat: null, toast: true, toastMsg: val > 0 ? '✓ Orçamento definido' : '✓ Orçamento removido',
+      };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  /** Serializes the user's data for backup (no transient UI state). */
+  const exportData = useCallback(() => {
+    const { screen: _s, onbStep: _o, connecting: _c, hubOpen: _h, quickOpen: _q, addOpen: _a, toast: _t, toastMsg: _tm, editKind: _ek, editId: _ei, budgetCat: _bc, ...data } = state;
+    const payload = { app: 'financas', version: 3, exportedAt: new Date().toISOString(), data };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financas-backup-${isoDate(new Date())}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [state]);
+
+  const importData = useCallback((text: string): { ok: boolean; error?: string } => {
+    try {
+      const payload = JSON.parse(text);
+      const data = payload?.app === 'financas' ? payload.data : payload;
+      if (!data || typeof data !== 'object' || !Array.isArray(data.txns) || !Array.isArray(data.accounts)) {
+        return { ok: false, error: 'Arquivo não parece um backup do Finanças.' };
+      }
+      setState(p => ({
+        ...createInitialState(),
+        ...data,
+        userName: data.userName || p.userName,
+        screen: 'home',
+        toast: true,
+        toastMsg: '✓ Backup restaurado',
+      }));
+      clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setState(p2 => ({ ...p2, toast: false })), 1800);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Arquivo inválido.' };
+    }
+  }, []);
+
   const resetAll = useCallback(() => {
     localStorage.removeItem(dataKey(userId));
     setState({ ...createInitialState(), userName: accountName });
@@ -431,6 +544,15 @@ function useFinanceState(userId: string, accountName: string) {
     setEditGroup,
     saveEdit,
     deleteEdit,
+    toggleAddRecurring,
+    deleteRecurrence,
+    setSpendMonth,
+    openBudget,
+    closeBudget,
+    setBudgetCents,
+    saveBudget,
+    exportData,
+    importData,
     resetAll,
     setInvestPct,
     setAddType,
@@ -444,7 +566,8 @@ function useFinanceState(userId: string, accountName: string) {
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
       openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, saveQuick,
       openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, saveEdit, deleteEdit,
-      resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
+      toggleAddRecurring, deleteRecurrence, setSpendMonth, openBudget, closeBudget, setBudgetCents, saveBudget,
+      exportData, importData, resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
 
   const derived = useMemo(() => computeDerived(state), [state]);
 

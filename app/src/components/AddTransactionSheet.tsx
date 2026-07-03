@@ -1,6 +1,7 @@
 import { useFinance } from '../state/store';
 import { CAT_EMOJIS } from '../state/constants';
 import { AmountField } from './AmountField';
+import { Icon } from './Icon';
 
 const segBtnStyle: React.CSSProperties = {
   flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600,
@@ -216,12 +217,38 @@ export function AddTransactionSheet() {
           </>
         )}
 
+        {!editing && state.addType !== 'transferencia' && (
+          <button
+            onClick={actions.toggleAddRecurring}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 12,
+              background: state.addRecurring ? 'rgba(52,211,153,.1)' : 'rgba(255,255,255,.04)',
+              border: `1px solid ${state.addRecurring ? 'rgba(52,211,153,.4)' : 'rgba(255,255,255,.1)'}`,
+              borderRadius: 12, cursor: 'pointer', fontFamily: "'Inter'", textAlign: 'left',
+            }}
+          >
+            <span
+              style={{
+                width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                background: state.addRecurring ? '#10B981' : 'transparent',
+                border: state.addRecurring ? 'none' : '1.5px solid rgba(255,255,255,.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#04120C',
+              }}
+            >
+              {state.addRecurring && <Icon name="check" size={12} strokeWidth={3} />}
+            </span>
+            <span style={{ flex: 1 }}>
+              <span style={{ display: 'block', fontSize: 13.5, color: '#EDEFF2', fontWeight: 500 }}>Repetir todo mês</span>
+              <span style={{ display: 'block', fontSize: 11.5, color: '#9AA3AF' }}>Lança sozinha no dia {Math.min(parseInt(state.addDate.slice(8, 10), 10) || 1, 28)} dos próximos meses</span>
+            </span>
+          </button>
+        )}
+
         <button
           onClick={actions.save}
           style={{
-            width: '100%', padding: 15, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
-            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
-            boxShadow: '0 10px 24px -6px rgba(16,185,129,.6)',
+            width: '100%', padding: 15, background: '#10B981', border: 'none',
+            borderRadius: 14, color: '#04120C', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
           }}
         >
           {editing ? 'Salvar alterações' : 'Salvar transação'}

@@ -49,6 +49,18 @@ export interface Category {
   icon: string;
   color: string;
   bg: string;
+  /** monthly budget in R$; absent/0 = no budget */
+  budget?: number;
+}
+
+export interface Recurrence {
+  id: string;
+  desc: string;
+  cat: string;
+  icon: string;
+  amount: number; // signed like a Txn
+  accountId?: string | null;
+  day: number; // day of month it posts (1–28)
 }
 
 export interface Txn {
@@ -62,6 +74,8 @@ export interface Txn {
   accountId?: string | null;
   /** destination account, only for transferências */
   toAccountId?: string | null;
+  /** set when this transaction was posted by a recurrence */
+  recId?: string | null;
 }
 
 export type TxnType = 'despesa' | 'receita' | 'transferencia';
@@ -86,7 +100,13 @@ export interface AppState {
   addDate: string;
   addAccountId: string | null;
   addToAccountId: string | null;
+  addRecurring: boolean;
   addEditId: string | null;
+  /** month shown in the spending report; null = current */
+  spendMonth: string | null;
+  /** category whose budget is being edited (sheet open) */
+  budgetCat: string | null;
+  budgetCents: number;
   newCatOpen: boolean;
   newCatName: string;
   newCatIcon: string;
@@ -105,6 +125,7 @@ export interface AppState {
   debts: Debt[];
   investPct: number;
   categories: Category[];
+  recurrences: Recurrence[];
   accounts: Account[];
   investments: Investment[];
   goals: Goal[];

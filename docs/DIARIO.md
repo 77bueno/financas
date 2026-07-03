@@ -4,6 +4,25 @@ Registro contínuo de decisões, acertos e erros durante a evolução da platafo
 
 ---
 
+## 2026-07-03 — v6: recorrências, orçamentos, meses anteriores e backup
+
+**Pedido:** "pode fazer todos" — os 4 itens do diagnóstico de completude.
+
+### O que foi construído
+
+- **Recorrências mensais**: checkbox "Repetir todo mês" ao registrar despesa/receita (não transferência). A recorrência guarda descrição, categoria, valor, conta e o dia do mês (limitado a 28 pra existir em todo mês). Um efeito no store lança automaticamente as recorrências vencidas e ainda não lançadas no mês corrente — com débito na conta e toast "↻ Recorrência lançada". Gestão (listar/cancelar) no Perfil.
+- **Orçamento por categoria**: tocar numa categoria no relatório de Gastos abre a folha de orçamento (definir/remover limite mensal). A lista mostra barra de progresso, % do limite e alerta vermelho "estourou"; um aviso no topo conta quantas categorias estouraram no mês.
+- **Meses anteriores**: setas ‹ › no relatório de Gastos navegam do mês mais antigo com lançamentos até o atual. O fluxo Entrou/Saiu da Início continua sempre no mês corrente (decisão consciente: a Início é "agora", o relatório é histórico).
+- **Backup**: exportar baixa um JSON com todos os dados (sem estado transitório de UI); importar valida o arquivo e restaura tudo. Testado o ciclo completo: exportar → apagar tudo → importar → dados idênticos de volta.
+
+### O que deu certo / errado
+
+- ✅ E2E dos 4 recursos passou (recorrência criada e listada; limite 100 sobre gasto 120 → "estourou · 120%" + alerta; retro no mês passado visível só ao navegar; backup restaurou patrimônio exato).
+- 🐛 **Bugs meus, nos testes (não no app), de novo**: (1) usei `text=A, text=B` achando que era OR do Playwright — é uma string literal; (2) esperava a categoria "Alimentação" mas o app mantém a última categoria usada como default (comportamento desejado), então o lançamento caiu em "Assinaturas". Lição recorrente registrada: seletores de teste precisam mirar o que o app realmente exibe.
+- ℹ️ Descoberta do ambiente: todo `pkill -f "vite preview"` desta sessão retornava exit 144 porque o padrão casa com a própria linha de comando do shell que o executa (auto-kill). Inofensivo, mas explica os "erros" nos logs.
+
+---
+
 ## 2026-07-02 — v5: redesign "software de verdade" + autenticação
 
 **Pedido:** tirar a "cara de IA", parecer plataforma real; adicionar login/senha/recuperação/criar perfil; liberdade de cor; documentar tudo continuamente.

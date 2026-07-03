@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFinance } from '../state/store';
 import { dateLabel } from '../utils/format';
+import { Icon } from '../components/Icon';
 
 type TypeFilter = 'todas' | 'despesas' | 'receitas';
 
@@ -63,7 +64,7 @@ export function Txns() {
       <input
         value={search}
         onChange={e => setSearch(e.target.value)}
-        placeholder="🔍  Buscar — ex.: assinatura Claude, faculdade…"
+        placeholder="Buscar — ex.: assinatura Claude, faculdade…"
         style={{
           width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
           borderRadius: 14, padding: '12px 15px', color: '#fff', fontFamily: "'Inter'", fontSize: 13.5, outline: 'none',
@@ -83,7 +84,7 @@ export function Txns() {
 
       {groups.length === 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '40px 20px', textAlign: 'center' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 20, background: 'rgba(16,185,129,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🧾</div>
+          <div style={{ width: 64, height: 64, borderRadius: 20, background: 'rgba(16,185,129,.12)', color: '#34D399', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="list" size={28} /></div>
           <span style={{ fontSize: 13.5, color: '#9AA3AF', lineHeight: 1.5 }}>
             {derived.txnRows.length === 0 ? 'Nenhuma transação registrada ainda.' : 'Nada encontrado com esses filtros.'}
           </span>

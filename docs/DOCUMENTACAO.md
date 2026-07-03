@@ -108,6 +108,7 @@ Campos da folha "Nova transação":
 
 - **Os saldos das contas atualizam automaticamente** — inclusive ao **editar** (o efeito antigo é revertido e o novo aplicado) e ao **excluir** (o efeito é revertido).
 - **Transferência** não conta como gasto por categoria **nem** no Entrou/Saiu do mês — é dinheiro movendo entre contas suas.
+- **"Repetir todo mês"**: marca a transação como recorrente — ela se lança sozinha no mesmo dia (limitado ao dia 28) dos meses seguintes, com débito/crédito na conta. Gerencie/cancele recorrências no Perfil.
 - Salvar mostra um toast de confirmação e a transação aparece na Início e no Extrato.
 
 ### 3.3 Categorias personalizadas
@@ -166,10 +167,11 @@ Card **"🧮 Planejar meu mês"** na Início.
 
 ### 3.9 Relatório de gastos
 
-Aba **Gastos** — sempre referente ao **mês atual** (o título mostra mês/ano).
+Aba **Gastos** — abre no mês atual, com **setas ‹ ›** pra navegar por qualquer mês que tenha lançamentos.
 
 - **Donut** por categoria (proporções reais dos seus lançamentos) com total gasto no centro.
 - Lista de categorias ordenada por valor, com % dos gastos e total.
+- **Orçamento por categoria**: toque numa categoria pra definir um limite mensal. A linha ganha barra de progresso e % do limite; ao ultrapassar, fica vermelha ("estourou") e um alerta no topo resume quantas categorias passaram do orçamento no mês. Defina R$ 0 pra remover.
 - Sem gastos no mês → estado vazio com botão "+ Registrar um gasto".
 
 ### 3.10 Ano (histórico de patrimônio)
@@ -190,7 +192,9 @@ Avatar (inicial do nome) no header do desktop ou na Início do celular.
 | **Seu nome** | Edita o nome usado na saudação/avatar |
 | **Dados do mês** | Salário mensal e **fatura do cartão** (opcional — vira "A PAGAR" e desconta do patrimônio líquido) |
 | **Resumo** | Patrimônio, nº de contas, investimentos, metas e transações |
-| **Meus dados** | 🔎 **Carregar dados de exemplo** (substitui tudo pelo demo) · 🗑 **Apagar todos os dados** (com confirmação; volta ao onboarding) |
+| **Recorrências mensais** | Lista das transações recorrentes com dia e valor; ✕ cancela (lançamentos já feitos permanecem) |
+| **Backup** | **Exportar dados** (baixa JSON com tudo) · **Importar backup** (restaura um arquivo exportado — serve pra migrar de dispositivo) |
+| **Meus dados** | **Carregar dados de exemplo** (substitui tudo pelo demo) · **Apagar todos os dados** (com confirmação; volta ao onboarding) |
 
 > Aviso exibido no app: os dados ficam **somente no dispositivo** (navegador). Nada é enviado a servidor.
 
@@ -298,7 +302,8 @@ Tipos principais (completos em [`app/src/state/types.ts`](../app/src/state/types
 | Entidade | Campos | Observações |
 |---|---|---|
 | `Txn` | `id, desc, cat, icon, date (ISO), amount, accountId?, toAccountId?` | `amount` > 0 = receita; < 0 = saída. `cat` especial: `"Receita"`, `"Transferência"`. `accountId` = conta debitada/creditada; `toAccountId` = destino da transferência |
-| `Category` | `id, name, icon, color, bg` | 7 padrão + criadas pelo usuário (paleta em rotação) |
+| `Category` | `id, name, icon, color, bg, budget?` | 7 padrão + criadas pelo usuário (paleta em rotação); `budget` = limite mensal opcional |
+| `Recurrence` | `id, desc, cat, icon, amount, accountId?, day` | lançada automaticamente todo mês no `day` (1–28); transações geradas levam `recId` |
 | `Account` | `id, icon, name, bank, value, group` | `group`: `'disp'` (disponível) ou `'reserva'` (guardado) |
 | `Investment` | `id, name, value, cls, ret, good, color` | `cls/ret` são rótulos exibidos; aportes novos entram como `"aporte"` |
 | `Goal` | `id, icon, name, sub, saved, target, color` | progresso = `saved/target` (limitado a 100%) |
@@ -393,19 +398,15 @@ Não há passo manual: fazer merge/push na `main` publica. O `base: '/financas/'
 
 **Limitações atuais (por design ou escopo):**
 
-- Sem recorrência (assinaturas mensais precisam ser lançadas a cada mês).
+- Autenticação e dados são locais ao dispositivo (sem servidor/sincronização) — use o **backup** pra migrar.
 - Rendimento de investimentos é um rótulo informativo, não calculado.
-- Dados não sincronizam entre dispositivos (100% local).
 - Categorias podem ser criadas, mas ainda não renomeadas/excluídas.
-- O relatório de gastos mostra apenas o mês corrente (sem navegar meses anteriores).
+- Recorrências lançam no mês corrente em diante (não retroagem a meses anteriores à criação).
 
 **Roadmap sugerido (em ordem de impacto):**
 
-1. **Despesas recorrentes** (assinaturas geradas automaticamente todo mês).
-2. **Orçamento por categoria** (limite mensal + barra de progresso + alerta de estouro).
-3. **Navegar meses anteriores** no relatório de gastos.
-4. Gerenciar categorias (renomear, excluir, reordenar).
-5. Exportar/importar dados (JSON/CSV) — também resolve backup e migração de dispositivo.
-6. Desfazer exclusões pelo toast.
-7. Modo claro (tema).
-8. Sincronização opcional em nuvem (exigiria backend + autenticação).
+1. **Backend com sincronização** (ex.: Supabase) — contas de verdade entre dispositivos; a arquitetura AuthProvider/FinanceProvider já isola essa troca.
+2. Gerenciar categorias (renomear, excluir, reordenar).
+3. Desfazer exclusões pelo toast.
+4. Modo claro (tema).
+5. Notificações (fatura vencendo, orçamento perto do limite) via PWA.

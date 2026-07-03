@@ -1,5 +1,6 @@
 import type { AppState, Category } from './types';
 import { fmt, dateLabel } from '../utils/format';
+import { MONTHS_PT } from './constants';
 
 const FALLBACK_CAT: Omit<Category, 'id' | 'name'> = { icon: '💸', color: '#94A3B8', bg: 'rgba(148,163,184,.16)' };
 
@@ -24,14 +25,15 @@ export function computeDerived(state: AppState) {
   const catByName = new Map(state.categories.map(c => [c.name, c]));
   const catMeta = (name: string) => catByName.get(name) ?? { ...FALLBACK_CAT, id: '', name };
 
-  // current month scope
+  // current month scope (Home flow) + selected month (spending report)
   const now = new Date();
-  const ymPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const monthTxns = state.txns.filter(t => t.date.startsWith(ymPrefix));
+  const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const spendYM = state.spendMonth ?? currentYM;
+  const monthTxns = state.txns.filter(t => t.date.startsWith(spendYM));
 
-  // month flow from this month's transactions; transfers between own
+  // month flow from the CURRENT month's transactions; transfers between own
   // accounts move money around but don't enter or leave
-  const flowTxns = monthTxns.filter(t => t.cat !== 'Transferência');
+  const flowTxns = state.txns.filter(t => t.date.startsWith(currentYM) && t.cat !== 'Transferência');
   const entrou = flowTxns.filter(t => t.amount > 0).reduce((a, b) => a + b.amount, 0);
   const saiu = flowTxns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
   const sobrou = entrou - saiu;
@@ -47,6 +49,8 @@ export function computeDerived(state: AppState) {
   const spendCats = [...catTotals.entries()]
     .map(([name, total]) => {
       const meta = catMeta(name);
+      const budget = 'budget' in meta ? (meta as { budget?: number }).budget ?? 0 : 0;
+      const budgetPct = budget > 0 ? Math.round((total / budget) * 100) : 0;
       return {
         name,
         total,
@@ -55,9 +59,26 @@ export function computeDerived(state: AppState) {
         color: meta.color,
         bg: meta.bg,
         pct: totalSpend > 0 ? Math.round((total / totalSpend) * 100) : 0,
+        budget,
+        budgetStr: budget > 0 ? fmt(budget) : null,
+        budgetPct,
+        overBudget: budget > 0 && total > budget,
       };
     })
     .sort((a, b) => b.total - a.total);
+  const overBudgetCount = spendCats.filter(c => c.overBudget).length;
+
+  // month navigation for the spending report: from the oldest txn month to now
+  const txnMonths = state.txns.map(t => t.date.slice(0, 7));
+  const minYM = txnMonths.length ? txnMonths.reduce((a, b) => (a < b ? a : b)) : currentYM;
+  const shiftYM = (ym: string, delta: number) => {
+    const [y, m] = ym.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  };
+  const prevSpendMonth = spendYM > minYM ? shiftYM(spendYM, -1) : null;
+  const nextSpendMonth = spendYM < currentYM ? shiftYM(spendYM, 1) : null;
+  const spendMonthLabel = `${MONTHS_PT[Number(spendYM.slice(5, 7)) - 1]} ${spendYM.slice(0, 4)}`;
 
   let accPct = 0;
   const donutSegs: string[] = [];
@@ -139,6 +160,22 @@ export function computeDerived(state: AppState) {
     totalSpendStr: fmt(totalSpend),
     donutBg,
     homeTopCats: spendCats.slice(0, 3),
+    overBudgetCount,
+    spendYM,
+    spendMonthLabel,
+    prevSpendMonth,
+    nextSpendMonth,
+    isCurrentSpendMonth: spendYM === currentYM,
+    budgetAmountStr: fmt(state.budgetCents / 100),
+    recRows: state.recurrences.map(r => ({
+      id: r.id,
+      desc: r.desc,
+      cat: r.cat,
+      icon: r.icon,
+      day: r.day,
+      amountStr: (r.amount < 0 ? '- ' : '+ ') + fmt(r.amount),
+      color: r.amount < 0 ? '#F87171' : '#34D399',
+    })),
 
     // planner
     debtTotalStr: fmt(D),
