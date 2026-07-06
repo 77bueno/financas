@@ -6,8 +6,8 @@ const backBtnStyle: React.CSSProperties = {
 };
 
 const primaryBtnStyle: React.CSSProperties = {
-  width: '100%', padding: 15, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
-  borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+  width: '100%', padding: 15, background: '#10B981', border: 'none',
+  borderRadius: 16, color: '#04120C', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
 };
 
 const rowInputStyle: React.CSSProperties = {
@@ -28,7 +28,7 @@ export function Onboarding() {
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 22, paddingTop: 30 }}>
           <div
             style={{
-              width: 60, height: 60, borderRadius: 20, background: 'linear-gradient(135deg,#10B981,#059669)',
+              width: 60, height: 60, borderRadius: 20, background: '#10B981',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
               boxShadow: '0 12px 30px -8px rgba(16,185,129,.7)',
             }}
@@ -48,8 +48,8 @@ export function Onboarding() {
             <button
               onClick={actions.startManual}
               style={{
-                width: '100%', padding: 16, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
-                borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+                width: '100%', padding: 16, background: '#10B981', border: 'none',
+                borderRadius: 16, color: '#04120C', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
                 boxShadow: '0 12px 26px -8px rgba(16,185,129,.7)',
               }}
             >
@@ -194,8 +194,8 @@ export function Onboarding() {
           <button
             onClick={actions.finishOnb}
             style={{
-              width: '100%', padding: 16, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
-              borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+              width: '100%', padding: 16, background: '#10B981', border: 'none',
+              borderRadius: 16, color: '#04120C', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
               boxShadow: '0 12px 26px -8px rgba(16,185,129,.7)',
             }}
           >

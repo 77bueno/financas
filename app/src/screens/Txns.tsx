@@ -55,7 +55,7 @@ export function Txns() {
         </div>
         <button
           onClick={actions.openAdd}
-          style={{ background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none', height: 36, padding: '0 14px', borderRadius: 12, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+          style={{ background: '#10B981', border: 'none', height: 36, padding: '0 14px', borderRadius: 12, color: '#04120C', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
         >
           + Nova
         </button>
@@ -91,7 +91,7 @@ export function Txns() {
           {derived.txnRows.length === 0 && (
             <button
               onClick={actions.openAdd}
-              style={{ padding: '12px 20px', background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none', borderRadius: 13, color: '#fff', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+              style={{ padding: '12px 20px', background: '#10B981', border: 'none', borderRadius: 13, color: '#04120C', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
             >
               + Registrar a primeira
             </button>

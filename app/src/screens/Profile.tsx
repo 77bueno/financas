@@ -64,7 +64,7 @@ export function Profile() {
       <div style={{ ...cardStyle, alignItems: 'center', textAlign: 'center', gap: 14 }}>
         <div
           style={{
-            width: 72, height: 72, borderRadius: 24, background: 'linear-gradient(135deg,#10B981,#059669)',
+            width: 72, height: 72, borderRadius: 24, background: '#10B981',
             display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700,
             fontFamily: "'Space Grotesk'", fontSize: 30,
           }}
@@ -186,6 +186,27 @@ export function Profile() {
       </div>
 
       {/* dados */}
+      {/* categorias */}
+      <div style={cardStyle}>
+        <strong style={{ fontSize: 14.5, color: '#EDEFF2', fontWeight: 600 }}>Categorias</strong>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {state.categories.map(c => (
+            <button
+              key={c.id}
+              onClick={() => actions.openCatEdit(c.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '8px 13px', borderRadius: 99,
+                background: c.bg, border: `1px solid ${c.color}55`, color: '#EDEFF2',
+                fontSize: 12.5, fontWeight: 500, cursor: 'pointer', fontFamily: "'Inter'",
+              }}
+            >
+              {c.icon} {c.name}
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: 11.5, color: '#6B7280' }}>Toque pra renomear, trocar o ícone ou excluir.</span>
+      </div>
+
       {/* recorrências */}
       <div style={cardStyle}>
         <strong style={{ fontSize: 14.5, color: '#EDEFF2', fontWeight: 600 }}>Recorrências mensais</strong>

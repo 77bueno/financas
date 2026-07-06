@@ -97,8 +97,8 @@ export function EditSheet() {
         <button
           onClick={actions.saveEdit}
           style={{
-            width: '100%', padding: 15, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none',
-            borderRadius: 16, color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
+            width: '100%', padding: 15, background: '#10B981', border: 'none',
+            borderRadius: 16, color: '#04120C', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
             boxShadow: '0 10px 24px -6px rgba(16,185,129,.6)',
           }}
         >

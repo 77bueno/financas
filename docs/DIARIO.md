@@ -4,6 +4,15 @@ Registro contínuo de decisões, acertos e erros durante a evolução da platafo
 
 ---
 
+## 2026-07-03 — v6.1: desfazer exclusão + gestão de categorias
+
+- **Desfazer exclusão**: excluir uma transação agora guarda a transação por 5s e o toast ganha um botão "Desfazer" — restaurar reaplica o efeito no saldo da conta. Evita perda por toque acidental.
+- **Gerenciar categorias**: cartão "Categorias" no Perfil; tocar numa categoria abre folha pra **renomear** (propaga pra todas as transações, recorrências e pro chip default), **trocar o emoji**, ou **excluir** — lançamentos e recorrências migram automaticamente pra "Outros". A categoria "Outros" é protegida (sem excluir/renomear).
+- **Consistência visual**: os últimos botões com gradiente da era anterior viraram sólidos esmeralda com texto escuro (padrão do design system).
+- ✅ E2E: excluir→desfazer (saldo volta a re-debitar), renomear Alimentação→Comida propagando pro extrato, excluir categoria movendo pra "Outros", e "Outros" sem botão de excluir. Zero erros.
+
+---
+
 ## 2026-07-03 — v6: recorrências, orçamentos, meses anteriores e backup
 
 **Pedido:** "pode fazer todos" — os 4 itens do diagnóstico de completude.

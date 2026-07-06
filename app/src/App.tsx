@@ -13,6 +13,7 @@ import { Profile } from './screens/Profile';
 import { Txns } from './screens/Txns';
 import { EditSheet } from './components/EditSheet';
 import { BudgetSheet } from './components/BudgetSheet';
+import { CatEditSheet } from './components/CatEditSheet';
 import { AddTransactionSheet } from './components/AddTransactionSheet';
 import { Hub } from './components/Hub';
 import { QuickAddSheet } from './components/QuickAddSheet';
@@ -54,6 +55,7 @@ function AppShell() {
         <QuickAddSheet />
         <EditSheet />
         <BudgetSheet />
+        <CatEditSheet />
         <TabBar />
       </div>
     </div>
@@ -61,8 +63,8 @@ function AppShell() {
 }
 
 function ToastGate() {
-  const { state } = useFinance();
-  return <Toast show={state.toast} msg={state.toastMsg} />;
+  const { state, actions } = useFinance();
+  return <Toast show={state.toast} msg={state.toastMsg} onUndo={state.undoTxn ? actions.undoDelete : null} />;
 }
 
 function Gate() {

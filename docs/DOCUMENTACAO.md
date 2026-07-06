@@ -121,6 +121,8 @@ Na folha de transação, com tipo Despesa → **"+ nova categoria"**:
 
 Nomes duplicados (ignorando maiúsculas) não criam categoria nova — apenas selecionam a existente. As 7 categorias padrão: Alimentação, Transporte, Moradia, Lazer, Saúde, Assinaturas, Outros.
 
+**Gerenciar**: no Perfil, cartão **Categorias** — toque numa categoria pra **renomear** (atualiza todos os lançamentos e recorrências), **trocar o emoji** ou **excluir** (lançamentos migram pra "Outros"). "Outros" é protegida contra exclusão/renomeação.
+
 ### 3.4 Extrato
 
 Aba **Extrato** (header desktop) ou **"Ver todas ›"** na Início / **"ver extrato ›"** em Gastos.
@@ -128,7 +130,7 @@ Aba **Extrato** (header desktop) ou **"Ver todas ›"** na Início / **"ver extr
 - Lista completa de transações **agrupadas por dia** (Hoje, Ontem, "28 jun"…).
 - **Busca por texto** na descrição e categoria (ex.: buscar "claude").
 - **Filtros em chips**: Todas · Despesas · Receitas · uma chip por categoria usada.
-- **Tocar numa transação** abre a folha de edição: alterar tipo, descrição, valor, categoria, ou **Excluir**.
+- **Tocar numa transação** abre a folha de edição: alterar tipo, descrição, valor, categoria, ou **Excluir** — a exclusão mostra **"Desfazer"** no aviso por 5 segundos (restaurar devolve o efeito no saldo).
 
 ### 3.5 Contas (onde guardo)
 
@@ -406,7 +408,6 @@ Não há passo manual: fazer merge/push na `main` publica. O `base: '/financas/'
 **Roadmap sugerido (em ordem de impacto):**
 
 1. **Backend com sincronização** (ex.: Supabase) — contas de verdade entre dispositivos; a arquitetura AuthProvider/FinanceProvider já isola essa troca.
-2. Gerenciar categorias (renomear, excluir, reordenar).
-3. Desfazer exclusões pelo toast.
-4. Modo claro (tema).
-5. Notificações (fatura vencendo, orçamento perto do limite) via PWA.
+2. Modo claro (tema) — exige migrar as cores inline pra tokens CSS.
+3. Notificações (fatura vencendo, orçamento perto do limite) via PWA.
+4. Reordenar categorias; desfazer para contas/investimentos/cofrinhos.

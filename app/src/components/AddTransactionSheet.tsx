@@ -186,7 +186,7 @@ export function AddTransactionSheet() {
                 </div>
                 <button
                   onClick={actions.saveNewCat}
-                  style={{ width: '100%', padding: 11, background: 'linear-gradient(135deg,#10B981,#059669)', border: 'none', borderRadius: 12, color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+                  style={{ width: '100%', padding: 11, background: '#10B981', border: 'none', borderRadius: 12, color: '#04120C', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
                 >
                   Criar categoria
                 </button>

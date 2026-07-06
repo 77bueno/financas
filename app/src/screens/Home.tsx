@@ -28,7 +28,7 @@ export function Home() {
         <button
           onClick={actions.goProfile}
           style={{
-            width: 42, height: 42, borderRadius: 14, background: 'linear-gradient(135deg,#10B981,#059669)',
+            width: 42, height: 42, borderRadius: 14, background: '#10B981',
             display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700,
             fontFamily: "'Space Grotesk'", fontSize: 17,
             border: 'none', cursor: 'pointer',

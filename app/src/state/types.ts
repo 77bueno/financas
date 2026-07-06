@@ -107,6 +107,12 @@ export interface AppState {
   /** category whose budget is being edited (sheet open) */
   budgetCat: string | null;
   budgetCents: number;
+  /** category being renamed/edited in the profile (sheet open) */
+  catEditId: string | null;
+  catEditName: string;
+  catEditIcon: string;
+  /** last deleted transaction, restorable from the toast */
+  undoTxn: Txn | null;
   newCatOpen: boolean;
   newCatName: string;
   newCatIcon: string;

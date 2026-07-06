@@ -35,6 +35,8 @@ function loadInitial(userId: string, accountName: string): AppState {
         addRecurring: false,
         spendMonth: null,
         budgetCat: null,
+        catEditId: null,
+        undoTxn: null,
         newCatOpen: false,
         editKind: null,
         editId: null,
@@ -242,7 +244,20 @@ function useFinanceState(userId: string, accountName: string) {
     setState(p => {
       const t = p.txns.find(x => x.id === id);
       const accounts = t ? applyTxnToAccounts(p.accounts, t, -1) : p.accounts;
-      return { ...p, accounts, txns: p.txns.filter(x => x.id !== id), addOpen: false, addEditId: null, toast: true, toastMsg: '✓ Transação excluída' };
+      return { ...p, accounts, txns: p.txns.filter(x => x.id !== id), addOpen: false, addEditId: null, undoTxn: t ?? null, toast: true, toastMsg: '✓ Transação excluída' };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false, undoTxn: null })), 5000);
+  }, []);
+
+  /** Restores the last deleted transaction (re-applying its account effect). */
+  const undoDelete = useCallback(() => {
+    setState(p => {
+      const t = p.undoTxn;
+      if (!t) return p;
+      const accounts = applyTxnToAccounts(p.accounts, t, 1);
+      const txns = [t, ...p.txns].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+      return { ...p, accounts, txns, undoTxn: null, toast: true, toastMsg: '↩ Transação restaurada' };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
@@ -445,6 +460,62 @@ function useFinanceState(userId: string, accountName: string) {
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
   }, []);
 
+  // ---- category management (rename / re-icon / delete) ----
+  const openCatEdit = useCallback((id: string) => {
+    setState(p => {
+      const c = p.categories.find(x => x.id === id);
+      if (!c) return p;
+      return { ...p, catEditId: id, catEditName: c.name, catEditIcon: c.icon };
+    });
+  }, []);
+  const closeCatEdit = useCallback(() => setState(p => ({ ...p, catEditId: null })), []);
+  const setCatEditName = useCallback((v: string) => setState(p => ({ ...p, catEditName: v })), []);
+  const setCatEditIcon = useCallback((v: string) => setState(p => ({ ...p, catEditIcon: v })), []);
+
+  const saveCatEdit = useCallback(() => {
+    setState(p => {
+      const c = p.categories.find(x => x.id === p.catEditId);
+      if (!c) return { ...p, catEditId: null };
+      const newName = p.catEditName.trim() || c.name;
+      const clash = p.categories.some(x => x.id !== c.id && x.name.toLowerCase() === newName.toLowerCase());
+      if (clash) {
+        return { ...p, toast: true, toastMsg: 'Já existe uma categoria com esse nome' };
+      }
+      const renamed = newName !== c.name;
+      return {
+        ...p,
+        categories: p.categories.map(x => x.id === c.id ? { ...x, name: newName, icon: p.catEditIcon } : x),
+        txns: renamed || p.catEditIcon !== c.icon
+          ? p.txns.map(t => t.cat === c.name ? { ...t, cat: newName, icon: t.icon === c.icon ? p.catEditIcon : t.icon } : t)
+          : p.txns,
+        recurrences: p.recurrences.map(r => r.cat === c.name ? { ...r, cat: newName, icon: r.icon === c.icon ? p.catEditIcon : r.icon } : r),
+        addCat: p.addCat === c.name ? newName : p.addCat,
+        catEditId: null, toast: true, toastMsg: '✓ Categoria atualizada',
+      };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  /** Deletes a category; its transactions and recurrences move to "Outros". */
+  const deleteCat = useCallback(() => {
+    setState(p => {
+      const c = p.categories.find(x => x.id === p.catEditId);
+      if (!c || c.name === 'Outros') return { ...p, catEditId: null };
+      const outros = p.categories.find(x => x.name === 'Outros');
+      return {
+        ...p,
+        categories: p.categories.filter(x => x.id !== c.id),
+        txns: p.txns.map(t => t.cat === c.name ? { ...t, cat: 'Outros', icon: outros?.icon ?? '💸' } : t),
+        recurrences: p.recurrences.map(r => r.cat === c.name ? { ...r, cat: 'Outros', icon: outros?.icon ?? '💸' } : r),
+        addCat: p.addCat === c.name ? 'Outros' : p.addCat,
+        catEditId: null, toast: true, toastMsg: '✓ Categoria excluída — lançamentos foram para "Outros"',
+      };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 2600);
+  }, []);
+
   /** Serializes the user's data for backup (no transient UI state). */
   const exportData = useCallback(() => {
     const { screen: _s, onbStep: _o, connecting: _c, hubOpen: _h, quickOpen: _q, addOpen: _a, toast: _t, toastMsg: _tm, editKind: _ek, editId: _ei, budgetCat: _bc, ...data } = state;
@@ -544,6 +615,13 @@ function useFinanceState(userId: string, accountName: string) {
     setEditGroup,
     saveEdit,
     deleteEdit,
+    undoDelete,
+    openCatEdit,
+    closeCatEdit,
+    setCatEditName,
+    setCatEditIcon,
+    saveCatEdit,
+    deleteCat,
     toggleAddRecurring,
     deleteRecurrence,
     setSpendMonth,
@@ -566,6 +644,7 @@ function useFinanceState(userId: string, accountName: string) {
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
       openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, saveQuick,
       openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, saveEdit, deleteEdit,
+      undoDelete, openCatEdit, closeCatEdit, setCatEditName, setCatEditIcon, saveCatEdit, deleteCat,
       toggleAddRecurring, deleteRecurrence, setSpendMonth, openBudget, closeBudget, setBudgetCents, saveBudget,
       exportData, importData, resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
 
