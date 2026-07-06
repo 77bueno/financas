@@ -28,24 +28,24 @@ export function EditSheet() {
       <div
         className="sheet"
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#14171C',
-          borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
+          position: 'absolute', left: 0, right: 0, bottom: 0, background: 'var(--card)',
+          borderRadius: '28px 28px 0 0', borderTop: '1px solid var(--w10)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
         }}
       >
-        <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,.2)', borderRadius: 99, margin: '0 auto 16px' }} />
+        <div style={{ width: 40, height: 4, background: 'var(--w20)', borderRadius: 99, margin: '0 auto 16px' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-          <strong style={{ fontSize: 17, color: '#fff', fontWeight: 600 }}>{TITLES[kind]}</strong>
+          <strong style={{ fontSize: 17, color: 'var(--t1)', fontWeight: 600 }}>{TITLES[kind]}</strong>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={actions.deleteEdit}
-              style={{ background: 'rgba(248,113,113,.12)', border: '1px solid rgba(248,113,113,.3)', color: '#F87171', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+              style={{ background: 'rgba(248,113,113,.12)', border: '1px solid rgba(248,113,113,.3)', color: 'var(--red)', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
             >
               Excluir
             </button>
             <button
               onClick={actions.closeEdit}
-              style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C3C9D2', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
+              style={{ background: 'var(--w8)', border: 'none', color: 'var(--t2)', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
             >
               ✕
             </button>
@@ -53,13 +53,13 @@ export function EditSheet() {
         </div>
 
         {kind === 'conta' && (
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: 4, gap: 4, marginBottom: 14 }}>
+          <div style={{ display: 'flex', background: 'var(--w5)', borderRadius: 14, padding: 4, gap: 4, marginBottom: 14 }}>
             <button
               onClick={() => actions.setEditGroup('disp')}
               style={{
                 flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
                 background: state.editGroup === 'disp' ? '#10B981' : 'transparent',
-                color: state.editGroup === 'disp' ? '#fff' : '#9AA3AF',
+                color: state.editGroup === 'disp' ? 'var(--t1)' : 'var(--t3)',
               }}
             >
               💳 Disponível
@@ -68,8 +68,8 @@ export function EditSheet() {
               onClick={() => actions.setEditGroup('reserva')}
               style={{
                 flex: 1, border: 'none', padding: 9, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'",
-                background: state.editGroup === 'reserva' ? '#34D399' : 'transparent',
-                color: state.editGroup === 'reserva' ? '#052E1B' : '#9AA3AF',
+                background: state.editGroup === 'reserva' ? 'var(--green)' : 'transparent',
+                color: state.editGroup === 'reserva' ? '#052E1B' : 'var(--t3)',
               }}
             >
               🐷 Guardado
@@ -82,8 +82,8 @@ export function EditSheet() {
           onChange={e => actions.setEditName(e.target.value)}
           placeholder="Nome"
           style={{
-            width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-            borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Inter'", fontSize: 14,
+            width: '100%', background: 'var(--w5)', border: '1px solid var(--w10)',
+            borderRadius: 14, padding: '13px 15px', color: 'var(--t1)', fontFamily: "'Inter'", fontSize: 14,
             outline: 'none', marginBottom: 16,
           }}
         />

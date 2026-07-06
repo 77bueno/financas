@@ -6,24 +6,24 @@ export function Year() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn .3s both' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={actions.goHome} style={{ background: 'rgba(255,255,255,.06)', border: 'none', width: 34, height: 34, borderRadius: 11, color: '#C3C9D2', fontSize: 16, cursor: 'pointer' }}>‹</button>
+        <button onClick={actions.goHome} style={{ background: 'var(--w6)', border: 'none', width: 34, height: 34, borderRadius: 11, color: 'var(--t2)', fontSize: 16, cursor: 'pointer' }}>‹</button>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em' }}>O QUE MUDOU</span>
-          <strong style={{ fontSize: 20, color: '#EDEFF2', fontWeight: 700 }}>Seu ano até aqui</strong>
+          <span style={{ fontSize: 12, color: 'var(--t3)', letterSpacing: '.04em' }}>O QUE MUDOU</span>
+          <strong style={{ fontSize: 20, color: 'var(--t1)', fontWeight: 700 }}>Seu ano até aqui</strong>
         </div>
       </div>
 
       <div className="screen-cols">
       <div className="screen-col">
       {/* evolução patrimônio */}
-      <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 22, padding: '20px 18px 16px' }}>
+      <div style={{ background: 'var(--w4)', border: '1px solid var(--w8)', borderRadius: 22, padding: '20px 18px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 12, color: '#9AA3AF' }}>Patrimônio hoje</span>
-            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 26, color: '#fff', fontWeight: 600 }}>{derived.yearEndStr}</span>
+            <span style={{ fontSize: 12, color: 'var(--t3)' }}>Patrimônio hoje</span>
+            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 26, color: 'var(--t1)', fontWeight: 600 }}>{derived.yearEndStr}</span>
           </div>
           {derived.yearGrowthStr && (
-            <span style={{ background: 'rgba(52,211,153,.16)', color: '#34D399', fontSize: 12.5, fontWeight: 600, padding: '5px 11px', borderRadius: 99 }}>↑ {derived.yearGrowthStr} no período</span>
+            <span style={{ background: 'rgba(52,211,153,.16)', color: 'var(--green)', fontSize: 12.5, fontWeight: 600, padding: '5px 11px', borderRadius: 99 }}>↑ {derived.yearGrowthStr} no período</span>
           )}
         </div>
         {derived.yearBars.length > 0 && (
@@ -39,7 +39,7 @@ export function Year() {
         {!derived.hasHistory && (
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: 'rgba(16,185,129,.08)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 14, padding: 13, marginTop: 12 }}>
             <span style={{ fontSize: 16 }}>📅</span>
-            <span style={{ fontSize: 12.5, color: '#C3C9D2', lineHeight: 1.5 }}>
+            <span style={{ fontSize: 12.5, color: 'var(--t2)', lineHeight: 1.5 }}>
               Registramos seu patrimônio automaticamente, mês a mês. Volte no mês que vem pra começar a ver a evolução.
             </span>
           </div>
@@ -50,29 +50,29 @@ export function Year() {
       <div className="screen-col">
       {/* destaques */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <strong style={{ fontSize: 15, color: '#EDEFF2', fontWeight: 600 }}>Destaques</strong>
+        <strong style={{ fontSize: 15, color: 'var(--t1)', fontWeight: 600 }}>Destaques</strong>
         <div style={{ display: 'flex', gap: 10 }}>
           {derived.yearSavedStr && (
             <div style={{ flex: 1, background: 'rgba(52,211,153,.10)', border: '1px solid rgba(52,211,153,.2)', borderRadius: 18, padding: 15 }}>
-              <span style={{ fontSize: 11.5, color: '#34D399' }}>💰 Patrimônio cresceu</span>
-              <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: '#fff', fontWeight: 600, marginTop: 4 }}>{derived.yearSavedStr}</div>
-              <span style={{ fontSize: 11, color: '#6B7280' }}>desde {derived.yearFirstMonth}</span>
+              <span style={{ fontSize: 11.5, color: 'var(--green)' }}>💰 Patrimônio cresceu</span>
+              <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: 'var(--t1)', fontWeight: 600, marginTop: 4 }}>{derived.yearSavedStr}</div>
+              <span style={{ fontSize: 11, color: 'var(--t4)' }}>desde {derived.yearFirstMonth}</span>
             </div>
           )}
           <div style={{ flex: 1, background: 'rgba(16,185,129,.10)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 18, padding: 15 }}>
-            <span style={{ fontSize: 11.5, color: '#34D399' }}>📈 Investido</span>
-            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: '#fff', fontWeight: 600, marginTop: 4 }}>{derived.investedTotalStr}</div>
-            <span style={{ fontSize: 11, color: '#6B7280' }}>na carteira</span>
+            <span style={{ fontSize: 11.5, color: 'var(--green)' }}>📈 Investido</span>
+            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: 'var(--t1)', fontWeight: 600, marginTop: 4 }}>{derived.investedTotalStr}</div>
+            <span style={{ fontSize: 11, color: 'var(--t4)' }}>na carteira</span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 18, padding: 15 }}>
-            <span style={{ fontSize: 11.5, color: '#9AA3AF' }}>🐷 Guardado em metas</span>
-            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: '#fff', fontWeight: 600, marginTop: 4 }}>{derived.goalsSavedStr}</div>
+          <div style={{ flex: 1, background: 'var(--w4)', border: '1px solid var(--w7)', borderRadius: 18, padding: 15 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--t3)' }}>🐷 Guardado em metas</span>
+            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: 'var(--t1)', fontWeight: 600, marginTop: 4 }}>{derived.goalsSavedStr}</div>
           </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 18, padding: 15 }}>
-            <span style={{ fontSize: 11.5, color: '#9AA3AF' }}>🧾 Gasto registrado</span>
-            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: '#fff', fontWeight: 600, marginTop: 4 }}>{derived.totalSpendStr}</div>
+          <div style={{ flex: 1, background: 'var(--w4)', border: '1px solid var(--w7)', borderRadius: 18, padding: 15 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--t3)' }}>🧾 Gasto registrado</span>
+            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 19, color: 'var(--t1)', fontWeight: 600, marginTop: 4 }}>{derived.totalSpendStr}</div>
           </div>
         </div>
       </div>

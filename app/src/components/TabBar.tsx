@@ -1,8 +1,8 @@
 import { useFinance } from '../state/store';
 import { Icon } from './Icon';
 
-const ACTIVE = '#34D399';
-const INACTIVE = '#6B7280';
+const ACTIVE = 'var(--green)';
+const INACTIVE = 'var(--t4)';
 
 const btnStyle: React.CSSProperties = {
   background: 'none', border: 'none', cursor: 'pointer',
@@ -28,8 +28,8 @@ export function TabBar() {
       style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
         height: 'calc(76px + env(safe-area-inset-bottom))', zIndex: 10,
-        background: 'rgba(11,13,16,.88)', backdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(255,255,255,.07)',
+        background: 'var(--chrome)', backdropFilter: 'blur(16px)',
+        borderTop: '1px solid var(--w7)',
         display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around',
         paddingTop: 12, paddingBottom: 'env(safe-area-inset-bottom)',
       }}

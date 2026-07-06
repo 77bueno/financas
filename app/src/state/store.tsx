@@ -362,7 +362,7 @@ function useFinanceState(userId: string, accountName: string) {
         next = { goals: [...p.goals, { id: nextId('goal'), icon: '🐷', name: name || 'Novo cofrinho', sub: 'Meta', saved: 0, target: val || 1000, color: '#10B981' }] };
         msg = '✓ Cofrinho criado';
       } else if (kind === 'investimento') {
-        next = { investments: [...p.investments, { id: nextId('inv'), name: name || 'Novo aporte', value: val, cls: 'aporte', ret: '—', good: true, color: '#34D399' }] };
+        next = { investments: [...p.investments, { id: nextId('inv'), name: name || 'Novo aporte', value: val, cls: 'aporte', ret: '—', good: true, color: 'var(--green)' }] };
         msg = '✓ Investimento adicionado';
       }
       return { ...p, ...next, quickOpen: false, toast: true, toastMsg: msg };

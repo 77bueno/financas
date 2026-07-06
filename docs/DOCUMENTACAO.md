@@ -191,8 +191,10 @@ Avatar (inicial do nome) no header do desktop ou na Início do celular.
 
 | Seção | O que faz |
 |---|---|
-| **Seu nome** | Edita o nome usado na saudação/avatar |
+| **Seu nome / conta** | Edita o nome usado na saudação/avatar; mostra o e-mail da conta; **Trocar senha** (com a senha atual) e **Sair da conta** |
+| **Aparência** | Alterna entre tema **Escuro** e **Claro** — troca instantânea, salva no dispositivo (`financas-theme`); sem escolha salva, segue o tema do sistema |
 | **Dados do mês** | Salário mensal e **fatura do cartão** (opcional — vira "A PAGAR" e desconta do patrimônio líquido) |
+| **Categorias** | Renomear (propaga pra lançamentos e recorrências), trocar o emoji ou excluir categorias ("Outros" é protegida) |
 | **Resumo** | Patrimônio, nº de contas, investimentos, metas e transações |
 | **Recorrências mensais** | Lista das transações recorrentes com dia e valor; ✕ cancela (lançamentos já feitos permanecem) |
 | **Backup** | **Exportar dados** (baixa JSON com tudo) · **Importar backup** (restaura um arquivo exportado — serve pra migrar de dispositivo) |
@@ -216,6 +218,14 @@ O app ocupa **a tela inteira** em qualquer tamanho (sem molduras). Três faixas 
 - As folhas (sheets) de adicionar/editar sobem de baixo; no desktop ficam limitadas a 560px centralizados.
 - `safe-area-inset` aplicado em tab bar, folhas e toast (notch/home indicator).
 
+### Temas (claro/escuro)
+
+Todo o app pinta com **CSS custom properties** definidas em `index.css`: o tema escuro é o padrão (`:root`) e o claro sobrescreve os mesmos tokens em `:root[data-theme="light"]`. Tokens: fundo (`--bg`, `--card`, `--chrome`), rampa de texto (`--t1`…`--t6`), "washes" de superfície/borda (`--w4`…`--w30`) e semânticos (`--green`, `--red`, `--red2`, `--amber`).
+
+- **Preferência** (`src/theme.ts`): salva em `localStorage` na chave `financas-theme`; sem escolha salva, segue o `prefers-color-scheme` do sistema.
+- **Troca**: cartão **Aparência** no Perfil (Escuro/Claro) — aplica na hora, sem recarregar, e atualiza a `meta theme-color` da barra do navegador (`#0B0D10` escuro / `#F3F5F7` claro).
+- **Cores persistidas** (categorias, dados demo) continuam hex literais — só o *chrome* do app é tematizado, o que garante que export/import de backup funcione igual nos dois temas.
+
 ```mermaid
 flowchart LR
     subgraph Navegação principal
@@ -236,10 +246,10 @@ flowchart LR
 
 ```
 app/
-├── index.html                  # metatags PWA/mobile, fontes (Sora, Space Grotesk)
+├── index.html                  # metatags PWA/mobile, fontes (Inter, Space Grotesk)
 ├── vite.config.ts              # base /financas/, plugin PWA (manifest + workbox)
 ├── public/
-│   ├── favicon.svg             # marca "R$" (gradiente roxo)
+│   ├── favicon.svg             # marca da carteira (esmeralda sólido)
 │   ├── apple-touch-icon.png
 │   └── pwa/icon-{192,512,512-maskable}.png
 └── src/
@@ -343,6 +353,7 @@ Todas implementadas em [`app/src/state/derived.ts`](../app/src/state/derived.ts)
   - `financas-users-v1` — registro de contas (nome, e-mail, hashes de senha/código).
   - `financas-session-v1` — sessão ativa.
   - `financas-data-v1:<userId>` — dados financeiros de cada perfil.
+  - `financas-theme` — tema escolhido (`dark`/`light`); vale pro dispositivo, não por perfil.
   - Dados da versão anterior (`financas-app-state-v3`) são migrados automaticamente para o primeiro perfil que fizer login.
 - **Quando:** a cada mudança de estado (efeito no store).
 - **Versão:** a chave é versionada (`-v3`). Mudanças estruturais incompatíveis trocam a versão — o app então recomeça zerado (dados antigos permanecem órfãos na chave anterior).
@@ -355,8 +366,8 @@ Todas implementadas em [`app/src/state/derived.ts`](../app/src/state/derived.ts)
 
 Configuração em [`app/vite.config.ts`](../app/vite.config.ts) via `vite-plugin-pwa`:
 
-- **Manifest:** nome "Finanças", `display: standalone`, `orientation: portrait`, tema `#150f2c`, fundo `#0a0814`, `start_url`/`scope` = `/financas/`.
-- **Ícones:** 192px e 512px (`purpose: any`) + 512px maskable (Android), + `apple-touch-icon` 180px — todos com a marca da moeda no gradiente roxo do app.
+- **Manifest:** nome "Finanças", `display: standalone`, `orientation: portrait`, tema/fundo `#0B0D10` (grafite), `start_url`/`scope` = `/financas/`. A `meta theme-color` da página é dinâmica (segue o tema claro/escuro escolhido).
+- **Ícones:** 192px e 512px (`purpose: any`) + 512px maskable (Android), + `apple-touch-icon` 180px — a marca da carteira em esmeralda.
 - **Service worker:** gerado pelo Workbox (`generateSW`), pré-cacheia todos os assets (`js/css/html/svg/png/woff2`) → o **app shell abre offline**; `registerType: autoUpdate` troca a versão automaticamente.
 - **Meta tags** iOS/Android em `index.html` (`apple-mobile-web-app-*`, `theme-color`, `viewport-fit=cover`).
 

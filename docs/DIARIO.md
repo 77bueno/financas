@@ -4,6 +4,25 @@ Registro contínuo de decisões, acertos e erros durante a evolução da platafo
 
 ---
 
+## 2026-07-06 — v7: modo claro/escuro
+
+**Pedido:** "manda bronca nas novas atualizações" — autonomia pra seguir o roadmap. Primeiro item: tema claro/escuro.
+
+### O que foi construído
+
+- **Tokens de cor em CSS custom properties**: todo o app agora pinta com variáveis (`--bg`, `--card`, `--t1..--t6` pra rampa de texto, `--w4..--w30` pros "washes" de fundo/borda, `--green/--red/--red2/--amber` pros semânticos). O tema escuro é o padrão em `:root`; o claro sobrescreve tudo em `:root[data-theme="light"]`.
+- **`src/theme.ts`**: preferência salva em `financas-theme`; sem preferência salva, segue o `prefers-color-scheme` do sistema. Troca ao vivo também atualiza a `meta theme-color` (barra do navegador/PWA: `#0B0D10` escuro, `#F3F5F7` claro).
+- **Toggle no Perfil**: cartão "Aparência" com Escuro/Claro — troca instantânea, sem recarregar.
+- **Decisão importante**: dados persistidos (cores de categorias em `constants.ts`/`initialState.ts`) continuam **hex literais** — `var(--x)` dentro do localStorage quebraria export/import e qualquer render fora do contexto do tema. O sweep de conversão excluiu esses dois arquivos de propósito.
+
+### O que deu certo / errado
+
+- ✅ Sweep por `sed` (mapa literal→token) converteu todos os `.tsx` + `derived.ts` de uma vez; build e E2E passaram.
+- ✅ E2E: screenshots escuro+claro de Início/Gastos/Extrato/Perfil a 1600px, toggle ao vivo no mobile confirmando `--bg` → `#F3F5F7`, zero erros de página.
+- 🐛 **Bug meu**: três literais fora do mapa (`#ECFDF5`, `#A7F3D0`, `#6EE7B7` — textos claros sobre fundos esmeralda) ficaram **ilegíveis no tema claro** (texto quase branco sobre cartão claro) na Início e no Planejar. Corrigido mapeando pra `var(--t1)`/`var(--green)`/`var(--t3)` e re-verificado com screenshots. Lição: sweep de cores precisa de uma varredura final por literais remanescentes (`grep '#[0-9A-F]\{6\}'`) antes de dar por encerrado.
+
+---
+
 ## 2026-07-03 — v6.1: desfazer exclusão + gestão de categorias
 
 - **Desfazer exclusão**: excluir uma transação agora guarda a transação por 5s e o toast ganha um botão "Desfazer" — restaurar reaplica o efeito no saldo da conta. Evita perda por toque acidental.

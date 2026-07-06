@@ -1,8 +1,8 @@
 import { useFinance } from '../state/store';
 import { Icon } from './Icon';
 
-const ACTIVE = '#EDEFF2';
-const INACTIVE = '#8B93A0';
+const ACTIVE = 'var(--t1)';
+const INACTIVE = 'var(--t5)';
 
 const itemStyle: React.CSSProperties = {
   background: 'none', border: 'none', cursor: 'pointer',
@@ -24,10 +24,10 @@ export function TopNav() {
       style={{
         ...itemStyle,
         color: active(screen) ? ACTIVE : INACTIVE,
-        background: active(screen) ? 'rgba(255,255,255,.06)' : 'none',
+        background: active(screen) ? 'var(--w6)' : 'none',
       }}
     >
-      <Icon name={icon} size={16} strokeWidth={2} style={{ color: active(screen) ? '#34D399' : 'currentColor' }} />
+      <Icon name={icon} size={16} strokeWidth={2} style={{ color: active(screen) ? 'var(--green)' : 'currentColor' }} />
       {label}
     </button>
   );
@@ -43,7 +43,7 @@ export function TopNav() {
         >
           <Icon name="wallet" size={19} strokeWidth={2} />
         </div>
-        <strong style={{ fontSize: 15.5, color: '#EDEFF2', fontWeight: 700, fontFamily: "'Inter'", letterSpacing: '-.01em' }}>Finanças</strong>
+        <strong style={{ fontSize: 15.5, color: 'var(--t1)', fontWeight: 700, fontFamily: "'Inter'", letterSpacing: '-.01em' }}>Finanças</strong>
       </div>
 
       <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -73,9 +73,9 @@ export function TopNav() {
         style={{
           marginLeft: 10,
           width: 38, height: 38, borderRadius: 10,
-          background: 'rgba(255,255,255,.06)',
-          border: state.screen === 'profile' ? '1px solid #34D399' : '1px solid rgba(255,255,255,.1)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EDEFF2', fontWeight: 600,
+          background: 'var(--w6)',
+          border: state.screen === 'profile' ? '1px solid #34D399' : '1px solid var(--w10)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--t1)', fontWeight: 600,
           fontFamily: "'Inter'", fontSize: 14, cursor: 'pointer',
         }}
       >

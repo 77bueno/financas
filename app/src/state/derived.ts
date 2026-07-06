@@ -89,7 +89,7 @@ export function computeDerived(state: AppState) {
   }
   const donutBg = donutSegs.length
     ? `conic-gradient(${donutSegs.join(', ')})`
-    : 'conic-gradient(rgba(255,255,255,.07) 0 100%)';
+    : 'conic-gradient(var(--w7) 0 100%)';
 
   // net-worth history (auto-recorded monthly snapshots)
   const yd = state.yearData;
@@ -100,7 +100,7 @@ export function computeDerived(state: AppState) {
       m: d.m,
       h: (maxYear > 0 ? (d.v / maxYear) * 80 + 12 : 12) + '%',
       barBg: last ? 'linear-gradient(#34D399,#10B981)' : 'rgba(16,185,129,.4)',
-      labelColor: last ? '#34D399' : '#6B7280',
+      labelColor: last ? 'var(--green)' : 'var(--t4)',
     };
   });
   const hasHistory = yd.length >= 2;
@@ -128,7 +128,7 @@ export function computeDerived(state: AppState) {
       sub: `${t.cat} · ${dateLabel(t.date)}${accLabel}`,
       date: t.date,
       amountStr: (t.amount < 0 ? '- ' : '+ ') + fmt(t.amount),
-      color: t.amount < 0 ? '#F87171' : '#34D399',
+      color: t.amount < 0 ? 'var(--red)' : 'var(--green)',
       isExpense: t.amount < 0,
     };
   };
@@ -174,7 +174,7 @@ export function computeDerived(state: AppState) {
       icon: r.icon,
       day: r.day,
       amountStr: (r.amount < 0 ? '- ' : '+ ') + fmt(r.amount),
-      color: r.amount < 0 ? '#F87171' : '#34D399',
+      color: r.amount < 0 ? 'var(--red)' : 'var(--green)',
     })),
 
     // planner
@@ -184,7 +184,7 @@ export function computeDerived(state: AppState) {
     dailyStr: fmt(dailyV),
     salaryFmt: fmt(S),
     commitPct: commit + '%',
-    commitColor: commit > 40 ? '#F87171' : commit > 30 ? '#FBBF24' : '#34D399',
+    commitColor: commit > 40 ? 'var(--red)' : commit > 30 ? 'var(--amber)' : 'var(--green)',
     commitMsg: commit > 40 ? 'Comprometimento alto — corte dívidas' : commit > 30 ? 'Dá pra melhorar um pouco' : 'Comprometimento saudável',
     barDebtW: w(D),
     barInvestW: w(investV),
@@ -210,7 +210,7 @@ export function computeDerived(state: AppState) {
       valueStr: fmt(iv.value),
       cls: Math.round((iv.value / (investedTotal || 1)) * 100) + '% · ' + iv.cls,
       ret: iv.ret,
-      retColor: iv.good ? '#34D399' : '#F87171',
+      retColor: iv.good ? 'var(--green)' : 'var(--red)',
       color: iv.color,
     })),
     goalRows: state.goals.map(g => {
@@ -232,7 +232,7 @@ export function computeDerived(state: AppState) {
     txnRows: state.txns.map(toTxnRow),
 
     amountStr: fmt(state.cents / 100),
-    amountColor: state.addType === 'receita' ? '#34D399' : state.addType === 'transferencia' ? '#FBBF24' : '#F87171',
+    amountColor: state.addType === 'receita' ? 'var(--green)' : state.addType === 'transferencia' ? 'var(--amber)' : 'var(--red)',
     quickAmountStr: fmt(state.quickCents / 100),
     editAmountStr: fmt(state.editCents / 100),
     editAmount2Str: fmt(state.editCents2 / 100),

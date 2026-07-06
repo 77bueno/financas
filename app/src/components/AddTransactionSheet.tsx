@@ -15,9 +15,9 @@ export function AddTransactionSheet() {
   const editing = state.addEditId !== null;
 
   const seg = {
-    despesa: { bg: state.addType === 'despesa' ? '#10B981' : 'transparent', color: state.addType === 'despesa' ? '#fff' : '#9AA3AF' },
-    receita: { bg: state.addType === 'receita' ? '#34D399' : 'transparent', color: state.addType === 'receita' ? '#052E1B' : '#9AA3AF' },
-    transferencia: { bg: state.addType === 'transferencia' ? '#FBBF24' : 'transparent', color: state.addType === 'transferencia' ? '#451A03' : '#9AA3AF' },
+    despesa: { bg: state.addType === 'despesa' ? '#10B981' : 'transparent', color: state.addType === 'despesa' ? 'var(--t1)' : 'var(--t3)' },
+    receita: { bg: state.addType === 'receita' ? 'var(--green)' : 'transparent', color: state.addType === 'receita' ? '#052E1B' : 'var(--t3)' },
+    transferencia: { bg: state.addType === 'transferencia' ? 'var(--amber)' : 'transparent', color: state.addType === 'transferencia' ? '#451A03' : 'var(--t3)' },
   };
 
   return (
@@ -29,34 +29,34 @@ export function AddTransactionSheet() {
       <div
         className="sheet fin-scroll"
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#14171C',
-          borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
+          position: 'absolute', left: 0, right: 0, bottom: 0, background: 'var(--card)',
+          borderRadius: '28px 28px 0 0', borderTop: '1px solid var(--w10)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
           maxHeight: '88%', overflowY: 'auto',
         }}
       >
-        <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,.2)', borderRadius: 99, margin: '0 auto 16px' }} />
+        <div style={{ width: 40, height: 4, background: 'var(--w20)', borderRadius: 99, margin: '0 auto 16px' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <strong style={{ fontSize: 17, color: '#fff', fontWeight: 600 }}>{editing ? 'Editar transação' : 'Nova transação'}</strong>
+          <strong style={{ fontSize: 17, color: 'var(--t1)', fontWeight: 600 }}>{editing ? 'Editar transação' : 'Nova transação'}</strong>
           <div style={{ display: 'flex', gap: 8 }}>
             {editing && (
               <button
                 onClick={() => actions.deleteTxn(state.addEditId!)}
-                style={{ background: 'rgba(248,113,113,.12)', border: '1px solid rgba(248,113,113,.3)', color: '#F87171', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+                style={{ background: 'rgba(248,113,113,.12)', border: '1px solid rgba(248,113,113,.3)', color: 'var(--red)', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
               >
                 Excluir
               </button>
             )}
             <button
               onClick={actions.closeAdd}
-              style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C3C9D2', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
+              style={{ background: 'var(--w8)', border: 'none', color: 'var(--t2)', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
             >
               ✕
             </button>
           </div>
         </div>
 
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,.05)', borderRadius: 14, padding: 4, gap: 4, marginBottom: 16 }}>
+        <div style={{ display: 'flex', background: 'var(--w5)', borderRadius: 14, padding: 4, gap: 4, marginBottom: 16 }}>
           <button onClick={() => actions.setAddType('despesa')} style={{ ...segBtnStyle, background: seg.despesa.bg, color: seg.despesa.color }}>Despesa</button>
           <button onClick={() => actions.setAddType('receita')} style={{ ...segBtnStyle, background: seg.receita.bg, color: seg.receita.color }}>Receita</button>
           <button onClick={() => actions.setAddType('transferencia')} style={{ ...segBtnStyle, background: seg.transferencia.bg, color: seg.transferencia.color }}>Transferência</button>
@@ -68,8 +68,8 @@ export function AddTransactionSheet() {
             onChange={e => actions.setAddDesc(e.target.value)}
             placeholder={state.addType === 'receita' ? 'Ex.: Salário, freela do mês…' : 'Ex.: Assinatura Claude, faculdade, roupa…'}
             style={{
-              flex: 1, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-              borderRadius: 14, padding: '13px 15px', color: '#fff', fontFamily: "'Inter'", fontSize: 14,
+              flex: 1, minWidth: 0, background: 'var(--w5)', border: '1px solid var(--w10)',
+              borderRadius: 14, padding: '13px 15px', color: 'var(--t1)', fontFamily: "'Inter'", fontSize: 14,
               outline: 'none',
             }}
           />
@@ -78,9 +78,9 @@ export function AddTransactionSheet() {
             value={state.addDate}
             onChange={e => actions.setAddDate(e.target.value)}
             style={{
-              flexShrink: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-              borderRadius: 14, padding: '13px 12px', color: '#C3C9D2', fontFamily: "'Inter'", fontSize: 13,
-              outline: 'none', colorScheme: 'dark',
+              flexShrink: 0, background: 'var(--w5)', border: '1px solid var(--w10)',
+              borderRadius: 14, padding: '13px 12px', color: 'var(--t2)', fontFamily: "'Inter'", fontSize: 13,
+              outline: 'none', colorScheme: 'var(--scheme)' as 'dark',
             }}
           />
         </div>
@@ -89,7 +89,7 @@ export function AddTransactionSheet() {
 
         {state.accounts.length > 0 && (
           <div style={{ marginBottom: 14 }}>
-            <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em', display: 'block', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: 'var(--t3)', letterSpacing: '.04em', display: 'block', marginBottom: 8 }}>
               {state.addType === 'receita' ? 'ENTRA NA CONTA' : state.addType === 'transferencia' ? 'SAI DA CONTA' : 'SAI DA CONTA'}
             </span>
             <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
@@ -101,9 +101,9 @@ export function AddTransactionSheet() {
                     onClick={() => actions.setAddAccountId(sel ? null : a.id)}
                     style={{
                       flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-                      border: `1px solid ${sel ? '#10B981' : 'rgba(255,255,255,.08)'}`,
-                      background: sel ? 'rgba(16,185,129,.22)' : 'rgba(255,255,255,.04)',
-                      color: sel ? '#fff' : '#C3C9D2',
+                      border: `1px solid ${sel ? '#10B981' : 'var(--w8)'}`,
+                      background: sel ? 'rgba(16,185,129,.22)' : 'var(--w4)',
+                      color: sel ? 'var(--t1)' : 'var(--t2)',
                       padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
                       fontFamily: "'Inter'", fontWeight: 500,
                     }}
@@ -115,7 +115,7 @@ export function AddTransactionSheet() {
             </div>
             {state.addType === 'transferencia' && (
               <>
-                <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em', display: 'block', margin: '10px 0 8px' }}>ENTRA NA CONTA</span>
+                <span style={{ fontSize: 12, color: 'var(--t3)', letterSpacing: '.04em', display: 'block', margin: '10px 0 8px' }}>ENTRA NA CONTA</span>
                 <div className="fin-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
                   {state.accounts.filter(a => a.id !== state.addAccountId).map(a => {
                     const sel = state.addToAccountId === a.id;
@@ -125,9 +125,9 @@ export function AddTransactionSheet() {
                         onClick={() => actions.setAddToAccountId(sel ? null : a.id)}
                         style={{
                           flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-                          border: `1px solid ${sel ? '#34D399' : 'rgba(255,255,255,.08)'}`,
-                          background: sel ? 'rgba(52,211,153,.18)' : 'rgba(255,255,255,.04)',
-                          color: sel ? '#fff' : '#C3C9D2',
+                          border: `1px solid ${sel ? 'var(--green)' : 'var(--w8)'}`,
+                          background: sel ? 'rgba(52,211,153,.18)' : 'var(--w4)',
+                          color: sel ? 'var(--t1)' : 'var(--t2)',
                           padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
                           fontFamily: "'Inter'", fontWeight: 500,
                         }}
@@ -139,7 +139,7 @@ export function AddTransactionSheet() {
                 </div>
               </>
             )}
-            <span style={{ fontSize: 11, color: '#6B7280', display: 'block', marginTop: 6 }}>
+            <span style={{ fontSize: 11, color: 'var(--t4)', display: 'block', marginTop: 6 }}>
               {state.addAccountId ? 'O saldo da conta atualiza automaticamente.' : 'Sem conta selecionada — os saldos não mudam.'}
             </span>
           </div>
@@ -148,25 +148,25 @@ export function AddTransactionSheet() {
         {state.addType === 'despesa' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 12, color: '#9AA3AF', letterSpacing: '.04em' }}>CATEGORIA</span>
+              <span style={{ fontSize: 12, color: 'var(--t3)', letterSpacing: '.04em' }}>CATEGORIA</span>
               <button
                 onClick={actions.toggleNewCat}
-                style={{ background: 'none', border: 'none', color: '#34D399', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+                style={{ background: 'none', border: 'none', color: 'var(--green)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
               >
                 {state.newCatOpen ? 'cancelar' : '+ nova categoria'}
               </button>
             </div>
 
             {state.newCatOpen ? (
-              <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 14, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ background: 'var(--w4)', border: '1px solid var(--w10)', borderRadius: 16, padding: 14, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <input
                   value={state.newCatName}
                   onChange={e => actions.setNewCatName(e.target.value)}
                   placeholder="Nome da categoria — ex.: Educação"
                   autoFocus
                   style={{
-                    width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-                    borderRadius: 12, padding: '11px 13px', color: '#fff', fontFamily: "'Inter'", fontSize: 13.5, outline: 'none',
+                    width: '100%', background: 'var(--w5)', border: '1px solid var(--w10)',
+                    borderRadius: 12, padding: '11px 13px', color: 'var(--t1)', fontFamily: "'Inter'", fontSize: 13.5, outline: 'none',
                   }}
                 />
                 <div className="fin-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
@@ -176,8 +176,8 @@ export function AddTransactionSheet() {
                       onClick={() => actions.setNewCatIcon(e)}
                       style={{
                         flexShrink: 0, width: 38, height: 38, borderRadius: 11, fontSize: 18, cursor: 'pointer',
-                        background: state.newCatIcon === e ? 'rgba(16,185,129,.3)' : 'rgba(255,255,255,.05)',
-                        border: state.newCatIcon === e ? '1px solid #10B981' : '1px solid rgba(255,255,255,.08)',
+                        background: state.newCatIcon === e ? 'rgba(16,185,129,.3)' : 'var(--w5)',
+                        border: state.newCatIcon === e ? '1px solid #10B981' : '1px solid var(--w8)',
                       }}
                     >
                       {e}
@@ -201,9 +201,9 @@ export function AddTransactionSheet() {
                       onClick={() => actions.setAddCat(c.name)}
                       style={{
                         flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
-                        border: `1px solid ${sel ? c.color : 'rgba(255,255,255,.08)'}`,
-                        background: sel ? c.bg : 'rgba(255,255,255,.04)',
-                        color: sel ? '#fff' : '#C3C9D2',
+                        border: `1px solid ${sel ? c.color : 'var(--w8)'}`,
+                        background: sel ? c.bg : 'var(--w4)',
+                        color: sel ? 'var(--t1)' : 'var(--t2)',
                         padding: '8px 13px', borderRadius: 99, fontSize: 12.5, cursor: 'pointer',
                         fontFamily: "'Inter'", fontWeight: 500,
                       }}
@@ -222,8 +222,8 @@ export function AddTransactionSheet() {
             onClick={actions.toggleAddRecurring}
             style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 12,
-              background: state.addRecurring ? 'rgba(52,211,153,.1)' : 'rgba(255,255,255,.04)',
-              border: `1px solid ${state.addRecurring ? 'rgba(52,211,153,.4)' : 'rgba(255,255,255,.1)'}`,
+              background: state.addRecurring ? 'rgba(52,211,153,.1)' : 'var(--w4)',
+              border: `1px solid ${state.addRecurring ? 'rgba(52,211,153,.4)' : 'var(--w10)'}`,
               borderRadius: 12, cursor: 'pointer', fontFamily: "'Inter'", textAlign: 'left',
             }}
           >
@@ -231,15 +231,15 @@ export function AddTransactionSheet() {
               style={{
                 width: 18, height: 18, borderRadius: 5, flexShrink: 0,
                 background: state.addRecurring ? '#10B981' : 'transparent',
-                border: state.addRecurring ? 'none' : '1.5px solid rgba(255,255,255,.3)',
+                border: state.addRecurring ? 'none' : '1.5px solid var(--w30)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#04120C',
               }}
             >
               {state.addRecurring && <Icon name="check" size={12} strokeWidth={3} />}
             </span>
             <span style={{ flex: 1 }}>
-              <span style={{ display: 'block', fontSize: 13.5, color: '#EDEFF2', fontWeight: 500 }}>Repetir todo mês</span>
-              <span style={{ display: 'block', fontSize: 11.5, color: '#9AA3AF' }}>Lança sozinha no dia {Math.min(parseInt(state.addDate.slice(8, 10), 10) || 1, 28)} dos próximos meses</span>
+              <span style={{ display: 'block', fontSize: 13.5, color: 'var(--t1)', fontWeight: 500 }}>Repetir todo mês</span>
+              <span style={{ display: 'block', fontSize: 11.5, color: 'var(--t3)' }}>Lança sozinha no dia {Math.min(parseInt(state.addDate.slice(8, 10), 10) || 1, 28)} dos próximos meses</span>
             </span>
           </button>
         )}

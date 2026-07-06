@@ -16,24 +16,24 @@ export function BudgetSheet() {
       <div
         className="sheet"
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, background: '#14171C',
-          borderRadius: '28px 28px 0 0', borderTop: '1px solid rgba(255,255,255,.1)',
+          position: 'absolute', left: 0, right: 0, bottom: 0, background: 'var(--card)',
+          borderRadius: '28px 28px 0 0', borderTop: '1px solid var(--w10)',
           padding: '12px 22px calc(30px + env(safe-area-inset-bottom))', animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1) both',
         }}
       >
-        <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,.2)', borderRadius: 99, margin: '0 auto 16px' }} />
+        <div style={{ width: 40, height: 4, background: 'var(--w20)', borderRadius: 99, margin: '0 auto 16px' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <strong style={{ fontSize: 17, color: '#fff', fontWeight: 600 }}>
+          <strong style={{ fontSize: 17, color: 'var(--t1)', fontWeight: 600 }}>
             {cat?.icon} Orçamento — {state.budgetCat}
           </strong>
           <button
             onClick={actions.closeBudget}
-            style={{ background: 'rgba(255,255,255,.08)', border: 'none', color: '#C3C9D2', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
+            style={{ background: 'var(--w8)', border: 'none', color: 'var(--t2)', width: 30, height: 30, borderRadius: '50%', fontSize: 15, cursor: 'pointer' }}
           >
             ✕
           </button>
         </div>
-        <p style={{ margin: '0 0 16px', fontSize: 12.5, color: '#9AA3AF', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 12.5, color: 'var(--t3)', lineHeight: 1.5 }}>
           Limite mensal pra essa categoria. O relatório mostra o progresso e avisa quando estourar. Deixe em R$ 0,00 pra remover.
         </p>
 
