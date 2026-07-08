@@ -295,6 +295,12 @@ export function Profile() {
           />
         </div>
         {importErr && <span style={{ fontSize: 12.5, color: 'var(--red2)' }}>{importErr}</span>}
+        <button
+          onClick={actions.exportCsv}
+          style={{ width: '100%', padding: 12, background: 'var(--w5)', border: '1px solid var(--w12)', borderRadius: 12, color: 'var(--t2)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter'" }}
+        >
+          Exportar extrato em CSV (Excel/Sheets)
+        </button>
       </div>
 
       <div style={cardStyle}>

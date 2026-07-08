@@ -155,8 +155,9 @@ Aba **Investir**.
 Aba **Metas**.
 
 - Card-resumo com **total guardado** vs. total das metas.
-- Cada cofrinho mostra progresso (% e barra). **Tocar** abre a edição: nome, **"guardado até agora"** (é assim que se registra um aporte), meta a atingir, ou **Excluir**.
-- **+ Criar novo cofrinho**: nome + meta a atingir.
+- Cada cofrinho mostra progresso (% e barra). **Tocar** abre a edição: nome, **"guardado até agora"** (é assim que se registra um aporte), meta a atingir, **prazo** ou **Excluir**.
+- **+ Criar novo cofrinho**: nome + meta a atingir + **prazo opcional** (mês/ano).
+- **Ritmo mensal**: com prazo definido, o card mostra **"Guarde R$ X/mês até <mês>"** (o que falta dividido pelos meses restantes, incluindo o atual). Prazo vencido com meta incompleta fica vermelho; meta atingida vira "Meta atingida 🎉".
 
 ### 3.8 Planejar meu mês
 
@@ -172,6 +173,8 @@ Card **"🧮 Planejar meu mês"** na Início.
 Aba **Gastos** — abre no mês atual, com **setas ‹ ›** pra navegar por qualquer mês que tenha lançamentos.
 
 - **Donut** por categoria (proporções reais dos seus lançamentos) com total gasto no centro.
+- **Comparação com o mês anterior**: sob o donut, "X% a mais/a menos que em <mês>" (vermelho quando gastou mais, verde quando gastou menos). Cada categoria sem orçamento mostra também seu delta (↑/↓ %) contra o mês anterior.
+- **Tendência de 6 meses**: mini-gráfico de barras dos últimos 6 meses terminando no mês visto; o mês selecionado aparece em destaque com o valor. **Tocar numa barra** navega o relatório pra aquele mês. Aparece quando há pelo menos 2 meses com gastos.
 - Lista de categorias ordenada por valor, com % dos gastos e total.
 - **Orçamento por categoria**: toque numa categoria pra definir um limite mensal. A linha ganha barra de progresso e % do limite; ao ultrapassar, fica vermelha ("estourou") e um alerta no topo resume quantas categorias passaram do orçamento no mês. Defina R$ 0 pra remover.
 - Sem gastos no mês → estado vazio com botão "+ Registrar um gasto".
@@ -197,7 +200,7 @@ Avatar (inicial do nome) no header do desktop ou na Início do celular.
 | **Categorias** | Renomear (propaga pra lançamentos e recorrências), trocar o emoji ou excluir categorias ("Outros" é protegida) |
 | **Resumo** | Patrimônio, nº de contas, investimentos, metas e transações |
 | **Recorrências mensais** | Lista das transações recorrentes com dia e valor; ✕ cancela (lançamentos já feitos permanecem) |
-| **Backup** | **Exportar dados** (baixa JSON com tudo) · **Importar backup** (restaura um arquivo exportado — serve pra migrar de dispositivo) |
+| **Backup** | **Exportar dados** (JSON com tudo) · **Importar backup** (restaura um arquivo exportado) · **Exportar extrato em CSV** (`;` e vírgula decimal — abre direto no Excel/Sheets) |
 | **Meus dados** | **Carregar dados de exemplo** (substitui tudo pelo demo) · **Apagar todos os dados** (com confirmação; volta ao onboarding) |
 
 > Aviso exibido no app: os dados ficam **somente no dispositivo** (navegador). Nada é enviado a servidor.
@@ -318,7 +321,7 @@ Tipos principais (completos em [`app/src/state/types.ts`](../app/src/state/types
 | `Recurrence` | `id, desc, cat, icon, amount, accountId?, day` | lançada automaticamente todo mês no `day` (1–28); transações geradas levam `recId` |
 | `Account` | `id, icon, name, bank, value, group` | `group`: `'disp'` (disponível) ou `'reserva'` (guardado) |
 | `Investment` | `id, name, value, cls, ret, good, color` | `cls/ret` são rótulos exibidos; aportes novos entram como `"aporte"` |
-| `Goal` | `id, icon, name, sub, saved, target, color` | progresso = `saved/target` (limitado a 100%) |
+| `Goal` | `id, icon, name, sub, saved, target, color, deadline?` | progresso = `saved/target` (limitado a 100%); `deadline` (`YYYY-MM`) habilita o ritmo "guarde R$ X/mês" |
 | `Debt` | `id, name, value` | usado só no Planejar meu mês |
 | `YearPoint` | `key ("YYYY-MM"), m ("Jul"), v` | snapshot mensal do patrimônio |
 
@@ -391,6 +394,7 @@ npm run dev        # http://localhost:5173/financas/
 | `npm run build` | typecheck (`tsc -b`) + build de produção + service worker |
 | `npm run preview` | serve o build de produção localmente |
 | `npm run lint` | oxlint |
+| `npm test` | Vitest — testes de unidade das regras de cálculo (fluxo do mês, orçamento, comparação entre meses, ritmo de metas, efeito de transações nos saldos) |
 
 ### Deploy (automático)
 
@@ -398,12 +402,12 @@ Workflow em [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml):
 
 ```mermaid
 flowchart LR
-    A[push na main] --> B["build: npm ci + npm run build (Node 22)"]
+    A[push na main] --> B["npm ci + lint + testes + build (Node 22)"]
     B --> C[upload de app/dist como artefato Pages]
     C --> D[deploy-pages → 77bueno.github.io/financas/]
 ```
 
-Não há passo manual: fazer merge/push na `main` publica. O `base: '/financas/'` no Vite alinha os caminhos com a URL do GitHub Pages.
+Não há passo manual: fazer merge/push na `main` roda lint + testes e, passando, publica. O `base: '/financas/'` no Vite alinha os caminhos com a URL do GitHub Pages.
 
 ---
 

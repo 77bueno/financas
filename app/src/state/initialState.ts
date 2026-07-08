@@ -13,6 +13,7 @@ export function createInitialState(): AppState {
     quickName: '',
     quickCents: 0,
     quickGroup: 'disp',
+    quickDeadline: '',
     hidden: false,
     addOpen: false,
     addType: 'despesa',
@@ -39,6 +40,7 @@ export function createInitialState(): AppState {
     editCents: 0,
     editCents2: 0,
     editGroup: 'disp',
+    editDeadline: '',
     cents: 0,
     toast: false,
     toastMsg: '',
@@ -92,9 +94,9 @@ export function createDemoState(): AppState {
       { id: nextId('inv'), name: 'Cripto', value: 2410, cls: 'alto risco', ret: '↓ -2,1%', good: false, color: '#F87171' },
     ],
     goals: [
-      { id: nextId('goal'), icon: '✈️', name: 'Viagem — Chile', sub: 'Dezembro 2026', saved: 2100, target: 3000, color: '#10B981' },
+      { id: nextId('goal'), icon: '✈️', name: 'Viagem — Chile', sub: 'Dezembro 2026', saved: 2100, target: 3000, color: '#10B981', deadline: '2026-12' },
       { id: nextId('goal'), icon: '🛟', name: 'Reserva de emergência', sub: '6 meses de custo', saved: 4500, target: 10000, color: '#34D399' },
-      { id: nextId('goal'), icon: '📱', name: 'Trocar celular', sub: 'Setembro 2026', saved: 900, target: 2500, color: '#FBBF24' },
+      { id: nextId('goal'), icon: '📱', name: 'Trocar celular', sub: 'Setembro 2026', saved: 900, target: 2500, color: '#FBBF24', deadline: '2026-09' },
     ],
     yearData: [
       { key: ym(5), m: ml(5), v: 38200 }, { key: ym(4), m: ml(4), v: 39800 },
@@ -108,6 +110,16 @@ export function createDemoState(): AppState {
       { id: nextId('txn'), desc: 'Uber', cat: 'Transporte', icon: '🚗', date: isoDaysAgo(3), amount: -19.80, accountId: 'acc-demo-carteira' },
       { id: nextId('txn'), desc: 'Netflix', cat: 'Assinaturas', icon: '📺', date: isoDaysAgo(4), amount: -55.90, accountId: 'acc-demo-cc' },
       { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(6), amount: -1100, accountId: 'acc-demo-cc' },
+      // previous months (kept in descending date order), so the trend and
+      // month comparison in the report have history to show
+      { id: nextId('txn'), desc: 'Combustível', cat: 'Transporte', icon: '⛽', date: isoDaysAgo(33), amount: -180, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Mercado Extra', cat: 'Alimentação', icon: '🛒', date: isoDaysAgo(34), amount: -412.35, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(36), amount: -1100, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Salário', cat: 'Receita', icon: '💰', date: isoDaysAgo(38), amount: 5600, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Cinema', cat: 'Lazer', icon: '🎬', date: isoDaysAgo(40), amount: -64.50, accountId: 'acc-demo-carteira' },
+      { id: nextId('txn'), desc: 'Farmácia', cat: 'Saúde', icon: '💊', date: isoDaysAgo(63), amount: -98.70, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Mercado Extra', cat: 'Alimentação', icon: '🛒', date: isoDaysAgo(65), amount: -351.20, accountId: 'acc-demo-cc' },
+      { id: nextId('txn'), desc: 'Aluguel', cat: 'Moradia', icon: '🏠', date: isoDaysAgo(67), amount: -1100, accountId: 'acc-demo-cc' },
     ],
   };
 }

@@ -29,6 +29,8 @@ export interface Goal {
   saved: number;
   target: number;
   color: string;
+  /** optional target month, ISO YYYY-MM; enables the "save R$X/month" pace */
+  deadline?: string;
 }
 
 export interface Debt {
@@ -92,6 +94,8 @@ export interface AppState {
   quickName: string;
   quickCents: number;
   quickGroup: AccountGroup;
+  /** target month (YYYY-MM) when creating a cofrinho; '' = none */
+  quickDeadline: string;
   hidden: boolean;
   addOpen: boolean;
   addType: TxnType;
@@ -122,6 +126,8 @@ export interface AppState {
   editCents: number;
   editCents2: number;
   editGroup: AccountGroup;
+  /** target month (YYYY-MM) when editing a cofrinho; '' = none */
+  editDeadline: string;
   cents: number;
   toast: boolean;
   toastMsg: string;

@@ -64,7 +64,7 @@ function monthKey(d: Date): string {
  * balances. Despesa/receita move `amount` on the source account; transfers
  * additionally credit the destination account.
  */
-function applyTxnToAccounts(accounts: Account[], t: Pick<Txn, 'amount' | 'accountId' | 'toAccountId' | 'cat'>, sign: 1 | -1): Account[] {
+export function applyTxnToAccounts(accounts: Account[], t: Pick<Txn, 'amount' | 'accountId' | 'toAccountId' | 'cat'>, sign: 1 | -1): Account[] {
   if (!t.accountId && !t.toAccountId) return accounts;
   return accounts.map(a => {
     let v = a.value;
@@ -340,12 +340,13 @@ function useFinanceState(userId: string, accountName: string) {
   const openHub = useCallback(() => setState(p => ({ ...p, hubOpen: true })), []);
   const closeHub = useCallback(() => setState(p => ({ ...p, hubOpen: false })), []);
   const openQuick = useCallback((kind: 'conta' | 'cofrinho' | 'investimento') => {
-    setState(p => ({ ...p, hubOpen: false, quickOpen: true, quickKind: kind, quickName: '', quickCents: 0, quickGroup: 'disp' }));
+    setState(p => ({ ...p, hubOpen: false, quickOpen: true, quickKind: kind, quickName: '', quickCents: 0, quickGroup: 'disp', quickDeadline: '' }));
   }, []);
   const closeQuick = useCallback(() => setState(p => ({ ...p, quickOpen: false })), []);
   const setQuickCents = useCallback((v: string) => setState(p => ({ ...p, quickCents: Math.min(parseDigits(v), 9999999999) })), []);
   const setQuickName = useCallback((v: string) => setState(p => ({ ...p, quickName: v })), []);
   const setQuickGroup = useCallback((g: AccountGroup) => setState(p => ({ ...p, quickGroup: g })), []);
+  const setQuickDeadline = useCallback((v: string) => setState(p => ({ ...p, quickDeadline: v })), []);
 
   const saveQuick = useCallback(() => {
     setState(p => {
@@ -359,7 +360,7 @@ function useFinanceState(userId: string, accountName: string) {
         next = { accounts: [...p.accounts, { id: nextId('acc'), icon: reserva ? '🐷' : '🏦', name: name || 'Nova conta', bank: reserva ? 'Guardado' : 'Conta', value: val, group: p.quickGroup }] };
         msg = '✓ Conta adicionada';
       } else if (kind === 'cofrinho') {
-        next = { goals: [...p.goals, { id: nextId('goal'), icon: '🐷', name: name || 'Novo cofrinho', sub: 'Meta', saved: 0, target: val || 1000, color: '#10B981' }] };
+        next = { goals: [...p.goals, { id: nextId('goal'), icon: '🐷', name: name || 'Novo cofrinho', sub: 'Meta', saved: 0, target: val || 1000, color: '#10B981', deadline: p.quickDeadline || undefined }] };
         msg = '✓ Cofrinho criado';
       } else if (kind === 'investimento') {
         next = { investments: [...p.investments, { id: nextId('inv'), name: name || 'Novo aporte', value: val, cls: 'aporte', ret: '—', good: true, color: 'var(--green)' }] };
@@ -386,9 +387,10 @@ function useFinanceState(userId: string, accountName: string) {
       }
       const g = p.goals.find(x => x.id === id);
       if (!g) return p;
-      return { ...p, editKind: kind, editId: id, editName: g.name, editCents: Math.round(g.saved * 100), editCents2: Math.round(g.target * 100) };
+      return { ...p, editKind: kind, editId: id, editName: g.name, editCents: Math.round(g.saved * 100), editCents2: Math.round(g.target * 100), editDeadline: g.deadline ?? '' };
     });
   }, []);
+  const setEditDeadline = useCallback((v: string) => setState(p => ({ ...p, editDeadline: v })), []);
   const closeEdit = useCallback(() => setState(p => ({ ...p, editKind: null, editId: null })), []);
   const setEditName = useCallback((v: string) => setState(p => ({ ...p, editName: v })), []);
   const setEditCents = useCallback((v: string) => setState(p => ({ ...p, editCents: Math.min(parseDigits(v), 9999999999) })), []);
@@ -407,7 +409,7 @@ function useFinanceState(userId: string, accountName: string) {
       } else if (kind === 'investimento') {
         next = { investments: p.investments.map(iv => iv.id === id ? { ...iv, name: name || iv.name, value: val } : iv) };
       } else {
-        next = { goals: p.goals.map(g => g.id === id ? { ...g, name: name || g.name, saved: val, target: p.editCents2 / 100 || g.target } : g) };
+        next = { goals: p.goals.map(g => g.id === id ? { ...g, name: name || g.name, saved: val, target: p.editCents2 / 100 || g.target, deadline: p.editDeadline || undefined } : g) };
       }
       return { ...p, ...next, editKind: null, editId: null, toast: true, toastMsg: '✓ Alterações salvas' };
     });
@@ -529,6 +531,29 @@ function useFinanceState(userId: string, accountName: string) {
     URL.revokeObjectURL(url);
   }, [state]);
 
+  const exportCsv = useCallback(() => {
+    const accName = new Map(state.accounts.map(a => [a.id, a.name]));
+    // pt-BR spreadsheet dialect: ; separator and decimal comma
+    const esc = (v: string) => /[";\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+    const rows = state.txns.map(t => [
+      t.date,
+      esc(t.desc),
+      esc(t.cat),
+      esc((t.accountId && accName.get(t.accountId)) || ''),
+      esc((t.toAccountId && accName.get(t.toAccountId)) || ''),
+      t.amount.toFixed(2).replace('.', ','),
+    ].join(';'));
+    const csv = ['data;descricao;categoria;conta;conta_destino;valor', ...rows].join('\r\n');
+    // BOM so Excel opens it as UTF-8 (keeps accents intact)
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financas-extrato-${isoDate(new Date())}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [state.txns, state.accounts]);
+
   const importData = useCallback((text: string): { ok: boolean; error?: string } => {
     try {
       const payload = JSON.parse(text);
@@ -606,6 +631,7 @@ function useFinanceState(userId: string, accountName: string) {
     setQuickCents,
     setQuickName,
     setQuickGroup,
+    setQuickDeadline,
     saveQuick,
     openEditItem,
     closeEdit,
@@ -613,6 +639,7 @@ function useFinanceState(userId: string, accountName: string) {
     setEditCents,
     setEditCents2,
     setEditGroup,
+    setEditDeadline,
     saveEdit,
     deleteEdit,
     undoDelete,
@@ -630,6 +657,7 @@ function useFinanceState(userId: string, accountName: string) {
     setBudgetCents,
     saveBudget,
     exportData,
+    exportCsv,
     importData,
     resetAll,
     setInvestPct,
@@ -642,11 +670,11 @@ function useFinanceState(userId: string, accountName: string) {
   }), [go, toggleEye, setCents, setAddDesc, setAddDate, setAddAccountId, setAddToAccountId, save, deleteTxn, openEditTxn, toggleNewCat, setNewCatName, setNewCatIcon,
       saveNewCat, setSalary, setCardBill, setUserName, updateDebt, addDebt, removeDebt,
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
-      openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, saveQuick,
-      openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, saveEdit, deleteEdit,
+      openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, setQuickDeadline, saveQuick,
+      openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, setEditDeadline, saveEdit, deleteEdit,
       undoDelete, openCatEdit, closeCatEdit, setCatEditName, setCatEditIcon, saveCatEdit, deleteCat,
       toggleAddRecurring, deleteRecurrence, setSpendMonth, openBudget, closeBudget, setBudgetCents, saveBudget,
-      exportData, importData, resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
+      exportData, exportCsv, importData, resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
 
   const derived = useMemo(() => computeDerived(state), [state]);
 

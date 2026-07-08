@@ -43,6 +43,9 @@ export function Goals() {
                 <span style={{ color: 'var(--t2)', fontFamily: "'Space Grotesk'" }}>{g.savedStr}</span>
                 <span style={{ color: 'var(--t4)' }}>de {g.targetStr}</span>
               </div>
+              {g.paceStr && (
+                <span style={{ fontSize: 11.5, color: g.paceColor, fontWeight: 600 }}>{g.paceStr}</span>
+              )}
             </button>
           ))}
         </div>

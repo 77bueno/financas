@@ -4,6 +4,25 @@ Registro contínuo de decisões, acertos e erros durante a evolução da platafo
 
 ---
 
+## 2026-07-08 — v8: organização mais profunda (comparação, prazos, CSV, testes)
+
+**Direção do usuário:** o projeto é **organização financeira** — nada de parcelamento/cartão de vendas. Refoquei a rodada em análise e disciplina, com autonomia total ("faça as atualizações que achar pertinentes sem me pedir nada").
+
+### O que foi construído
+
+- **Comparação entre meses** no relatório de Gastos: "X% a mais/a menos que em <mês>" sob o donut (vermelho quando gastou mais, verde quando gastou menos), delta ↑/↓ por categoria contra o mês anterior, e **mini-gráfico de tendência dos últimos 6 meses** — série única esmaltada em um matiz só, mês selecionado em destaque com o valor, e **tocar numa barra navega o relatório** pra aquele mês (interação melhor que tooltip nesse contexto).
+- **Metas com prazo**: campo opcional de mês/ano ao criar/editar cofrinho (`Goal.deadline`). Com prazo, o card mostra **"Guarde R$ X/mês até <mês>"** (o que falta ÷ meses restantes, incluindo o atual); prazo vencido fica vermelho, meta completa vira "Meta atingida 🎉". Demo ganhou prazos e 2 meses de histórico de lançamentos pra essas features nascerem visíveis.
+- **Exportar extrato em CSV** no cartão Backup: separador `;`, vírgula decimal e BOM UTF-8 — abre direto no Excel/Sheets brasileiro sem configurar nada.
+- **Testes de unidade no CI**: Vitest com 25 testes das regras de cálculo (fluxo do mês excluindo transferências, orçamento/estouro, comparação entre meses, ritmo de metas, `applyTxnToAccounts` aplicar/reverter, formatação). O workflow agora roda **lint + testes antes do build** — push que quebra regra de cálculo não publica mais.
+
+### O que deu certo / errado
+
+- ✅ E2E completo: delta "13% a menos que em jun", tendência com 6 barras clicáveis, ritmos calculados certos (R$ 900 ÷ 6 meses = R$ 150/mês), edição de prazo recalculando na hora, cofrinho novo com prazo, CSV com 14 linhas válidas. Zero erros de página, nos dois temas.
+- ⚠️ Meus seletores de teste erraram de novo (placeholder "Ex.: Viagem" e o `strong` do logo em vez do título) — o app estava certo nos dois casos.
+- ℹ️ Decisão: o valor "guardado" dos cofrinhos segue **fora** do patrimônio e sem débito em conta — vincular aporte de cofrinho a conta mexeria na semântica do patrimônio inteiro; fica anotado como possível evolução consciente, não esquecimento.
+
+---
+
 ## 2026-07-06 — v7: modo claro/escuro
 
 **Pedido:** "manda bronca nas novas atualizações" — autonomia pra seguir o roadmap. Primeiro item: tema claro/escuro.

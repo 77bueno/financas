@@ -80,6 +80,54 @@ export function computeDerived(state: AppState) {
   const nextSpendMonth = spendYM < currentYM ? shiftYM(spendYM, 1) : null;
   const spendMonthLabel = `${MONTHS_PT[Number(spendYM.slice(5, 7)) - 1]} ${spendYM.slice(0, 4)}`;
 
+  // comparison with the month before the one being viewed
+  const prevYM = shiftYM(spendYM, -1);
+  const monthSpendOf = (ym: string) => state.txns.reduce(
+    (a, t) => (t.date.startsWith(ym) && t.amount < 0 && t.cat !== 'Transferência' ? a + Math.abs(t.amount) : a), 0);
+  const prevTotalSpend = monthSpendOf(prevYM);
+  const prevCatTotals = new Map<string, number>();
+  for (const t of state.txns) {
+    if (t.date.startsWith(prevYM) && t.amount < 0 && t.cat !== 'Transferência') {
+      prevCatTotals.set(t.cat, (prevCatTotals.get(t.cat) || 0) + Math.abs(t.amount));
+    }
+  }
+  const spendCatRows = spendCats.map(c => {
+    const prev = prevCatTotals.get(c.name) || 0;
+    const delta = prev > 0 ? Math.round((c.total / prev - 1) * 100) : null;
+    return {
+      ...c,
+      deltaStr: delta === null || delta === 0 ? null : `${delta > 0 ? '↑' : '↓'} ${Math.abs(delta)}%`,
+      deltaColor: delta !== null && delta > 0 ? 'var(--red)' : 'var(--green)',
+    };
+  });
+  const spendDelta = prevTotalSpend > 0 ? Math.round((totalSpend / prevTotalSpend - 1) * 100) : null;
+  const prevMonthName = MONTHS_PT[Number(prevYM.slice(5, 7)) - 1].toLowerCase();
+  const spendDeltaStr = spendDelta === null || totalSpend === 0
+    ? null
+    : spendDelta === 0
+      ? `mesmo total de ${prevMonthName}`
+      : `${Math.abs(spendDelta)}% ${spendDelta > 0 ? 'a mais' : 'a menos'} que em ${prevMonthName}`;
+  // spending less than last month is the good direction
+  const spendDeltaColor = spendDelta !== null && spendDelta > 0 ? 'var(--red)' : 'var(--green)';
+
+  // 6-month spend trend ending at the month being viewed
+  const trendYMs = [-5, -4, -3, -2, -1, 0].map(d => shiftYM(spendYM, d));
+  const trendMax = Math.max(...trendYMs.map(monthSpendOf), 1);
+  const spendTrend = trendYMs.map(ym => {
+    const total = monthSpendOf(ym);
+    return {
+      ym,
+      label: MONTHS_PT[Number(ym.slice(5, 7)) - 1],
+      total,
+      totalStr: fmt(total),
+      h: total > 0 ? Math.max((total / trendMax) * 100, 5) + '%' : '5%',
+      selected: ym === spendYM,
+      // only months inside the navigable range can be jumped to
+      clickable: ym >= minYM && ym <= currentYM,
+    };
+  });
+  const hasTrend = spendTrend.filter(m => m.total > 0).length >= 2;
+
   let accPct = 0;
   const donutSegs: string[] = [];
   for (const c of spendCats) {
@@ -155,7 +203,7 @@ export function computeDerived(state: AppState) {
     hasTxns: state.txns.length > 0,
 
     // spending
-    spendCats,
+    spendCats: spendCatRows,
     totalSpend,
     totalSpendStr: fmt(totalSpend),
     donutBg,
@@ -165,6 +213,10 @@ export function computeDerived(state: AppState) {
     spendMonthLabel,
     prevSpendMonth,
     nextSpendMonth,
+    spendDeltaStr,
+    spendDeltaColor,
+    spendTrend,
+    hasTrend,
     isCurrentSpendMonth: spendYM === currentYM,
     budgetAmountStr: fmt(state.budgetCents / 100),
     recRows: state.recurrences.map(r => ({
@@ -215,6 +267,28 @@ export function computeDerived(state: AppState) {
     })),
     goalRows: state.goals.map(g => {
       const pc = Math.min(Math.round((g.saved / (g.target || 1)) * 100), 100);
+      const missing = Math.max(g.target - g.saved, 0);
+      // months from the current one to the deadline, inclusive
+      let paceStr: string | null = null;
+      let paceColor = 'var(--t4)';
+      if (g.deadline) {
+        const [dy, dm] = g.deadline.split('-').map(Number);
+        const monthsLeft = (dy - now.getFullYear()) * 12 + (dm - (now.getMonth() + 1)) + 1;
+        const deadlineLabel = `${MONTHS_PT[dm - 1]} ${dy}`;
+        if (missing <= 0) {
+          paceStr = 'Meta atingida 🎉';
+          paceColor = 'var(--green)';
+        } else if (monthsLeft <= 0) {
+          paceStr = `Prazo vencido (${deadlineLabel}) — faltam ${fmt(missing)}`;
+          paceColor = 'var(--red)';
+        } else {
+          paceStr = `Guarde ${fmt(missing / monthsLeft)}/mês até ${deadlineLabel}`;
+          paceColor = 'var(--t3)';
+        }
+      } else if (missing <= 0 && g.target > 0) {
+        paceStr = 'Meta atingida 🎉';
+        paceColor = 'var(--green)';
+      }
       return {
         id: g.id,
         icon: g.icon,
@@ -225,6 +299,8 @@ export function computeDerived(state: AppState) {
         barW: pc + '%',
         savedStr: fmt(g.saved),
         targetStr: fmt(g.target),
+        paceStr,
+        paceColor,
       };
     }),
     accDisp: state.accounts.filter(a => a.group === 'disp').map(a => ({ id: a.id, icon: a.icon, name: a.name, bank: a.bank, valueStr: fmt(a.value) })),

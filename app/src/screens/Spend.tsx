@@ -64,7 +64,39 @@ export function Spend() {
             </div>
           </div>
         </div>
+        {derived.spendDeltaStr && (
+          <span style={{ fontSize: 12.5, color: derived.spendDeltaColor, textAlign: 'center', fontWeight: 600 }}>{derived.spendDeltaStr}</span>
+        )}
         <span style={{ fontSize: 11.5, color: 'var(--t4)', textAlign: 'center' }}>Toque numa categoria pra definir um orçamento mensal.</span>
+
+        {derived.hasTrend && (
+          <div style={{ background: 'var(--w4)', border: '1px solid var(--w7)', borderRadius: 18, padding: 16, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+            <strong style={{ fontSize: 13.5, color: 'var(--t1)', fontWeight: 600 }}>Gastos nos últimos 6 meses</strong>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 96 }}>
+              {derived.spendTrend.map(m => (
+                <button
+                  key={m.ym}
+                  onClick={() => m.clickable && actions.setSpendMonth(m.ym)}
+                  title={`${m.label}: ${m.totalStr}`}
+                  style={{
+                    flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                    alignItems: 'center', gap: 6, background: 'none', border: 'none', padding: 0,
+                    cursor: m.clickable ? 'pointer' : 'default', fontFamily: "'Inter'",
+                  }}
+                >
+                  {m.selected && m.total > 0 && (
+                    <span style={{ fontFamily: "'Space Grotesk'", fontSize: 10.5, color: 'var(--t2)', fontWeight: 600, whiteSpace: 'nowrap' }}>{m.totalStr}</span>
+                  )}
+                  <div style={{
+                    width: '100%', maxWidth: 34, height: m.h, borderRadius: '4px 4px 0 0', transition: 'height .3s',
+                    background: m.selected ? 'var(--green)' : m.total > 0 ? 'rgba(16,185,129,.35)' : 'var(--w7)',
+                  }} />
+                  <span style={{ fontSize: 10.5, color: m.selected ? 'var(--t2)' : 'var(--t4)', fontWeight: m.selected ? 600 : 400 }}>{m.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         </div>
 
         <div className="screen-col">
@@ -83,10 +115,12 @@ export function Spend() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: "'Space Grotesk'", fontSize: 14, color: 'var(--t1)', fontWeight: 600 }}>{c.totalStr}</div>
-                  {c.budget > 0 && (
+                  {c.budget > 0 ? (
                     <div style={{ fontSize: 11, color: c.overBudget ? 'var(--red)' : 'var(--green)', fontWeight: 600 }}>
                       {c.overBudget ? `estourou · ${c.budgetPct}%` : `${c.budgetPct}% do limite`}
                     </div>
+                  ) : c.deltaStr && (
+                    <div style={{ fontSize: 11, color: c.deltaColor, fontWeight: 600 }} title="comparado ao mês anterior">{c.deltaStr}</div>
                   )}
                 </div>
               </div>

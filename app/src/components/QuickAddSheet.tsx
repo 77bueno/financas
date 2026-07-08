@@ -72,6 +72,22 @@ export function QuickAddSheet() {
 
         <AmountField label={QUICK_VAL_LABEL[kind] ?? 'Valor'} valueStr={derived.quickAmountStr} onDigits={actions.setQuickCents} />
 
+        {state.quickKind === 'cofrinho' && (
+          <div style={{ marginBottom: 16 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--t3)', display: 'block', marginBottom: 6 }}>Prazo pra atingir (opcional)</span>
+            <input
+              type="month"
+              value={state.quickDeadline}
+              onChange={e => actions.setQuickDeadline(e.target.value)}
+              style={{
+                width: '100%', background: 'var(--w5)', border: '1px solid var(--w10)',
+                borderRadius: 14, padding: '11px 15px', color: 'var(--t1)', fontFamily: "'Inter'", fontSize: 14,
+                outline: 'none', colorScheme: 'var(--scheme)' as 'dark',
+              }}
+            />
+          </div>
+        )}
+
         <button
           onClick={actions.saveQuick}
           style={{

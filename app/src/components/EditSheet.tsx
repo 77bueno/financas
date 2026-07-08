@@ -91,7 +91,22 @@ export function EditSheet() {
         <AmountField label={VAL_LABELS[kind]} valueStr={derived.editAmountStr} onDigits={actions.setEditCents} />
 
         {kind === 'cofrinho' && (
-          <AmountField label="Meta a atingir" valueStr={derived.editAmount2Str} onDigits={actions.setEditCents2} />
+          <>
+            <AmountField label="Meta a atingir" valueStr={derived.editAmount2Str} onDigits={actions.setEditCents2} />
+            <div style={{ marginBottom: 16 }}>
+              <span style={{ fontSize: 11.5, color: 'var(--t3)', display: 'block', marginBottom: 6 }}>Prazo pra atingir (opcional)</span>
+              <input
+                type="month"
+                value={state.editDeadline}
+                onChange={e => actions.setEditDeadline(e.target.value)}
+                style={{
+                  width: '100%', background: 'var(--w5)', border: '1px solid var(--w10)',
+                  borderRadius: 14, padding: '11px 15px', color: 'var(--t1)', fontFamily: "'Inter'", fontSize: 14,
+                  outline: 'none', colorScheme: 'var(--scheme)' as 'dark',
+                }}
+              />
+            </div>
+          </>
         )}
 
         <button
