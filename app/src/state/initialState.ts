@@ -31,6 +31,7 @@ export function createInitialState(): AppState {
     catEditName: '',
     catEditIcon: '🎓',
     undoTxn: null,
+    undoItem: null,
     newCatOpen: false,
     newCatName: '',
     newCatIcon: '🎓',

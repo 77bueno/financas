@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { computeDerived } from './derived';
 import { createInitialState } from './initialState';
 import { fmt } from '../utils/format';
@@ -165,6 +165,56 @@ describe('metas com prazo (ritmo mensal)', () => {
   it('sem prazo não há ritmo', () => {
     const d = computeDerived(state({ goals: [goal({})] }));
     expect(d.goalRows[0].paceStr).toBeNull();
+  });
+});
+
+describe('próximas contas do mês (recorrências futuras)', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('lista recorrências com dia ainda por vir e projeta a sobra', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10)); // 10 mar 2026
+    const d = computeDerived(state({
+      txns: [txn({ amount: 2000, cat: 'Receita', date: '2026-03-05' })],
+      recurrences: [
+        { id: 'r1', desc: 'Aluguel', cat: 'Moradia', icon: '🏠', amount: -800, accountId: null, day: 15 },
+        { id: 'r2', desc: 'Academia', cat: 'Saúde', icon: '💪', amount: -100, accountId: null, day: 5 }, // já passou
+      ],
+    }));
+    expect(d.upcomingRecs).toHaveLength(1);
+    expect(d.upcomingRecs[0].desc).toBe('Aluguel');
+    expect(d.upcomingRecs[0].day).toBe(15);
+    // sobrou 2000 − aluguel 800 que ainda vem = 1200
+    expect(d.forecastStr).toBe(fmt(1200));
+    expect(d.forecastNeg).toBe(false);
+  });
+
+  it('previsão fica negativa quando as contas futuras superam a sobra', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10));
+    const d = computeDerived(state({
+      txns: [txn({ amount: 500, cat: 'Receita', date: '2026-03-05' })],
+      recurrences: [{ id: 'r1', desc: 'Aluguel', cat: 'Moradia', icon: '🏠', amount: -800, accountId: null, day: 20 }],
+    }));
+    expect(d.forecastNeg).toBe(true);
+    expect(d.forecastStr).toBe(fmt(300)); // exibido em módulo, sinal vem do contexto
+  });
+
+  it('sem recorrências futuras não há card', () => {
+    const d = computeDerived(state({}));
+    expect(d.hasUpcoming).toBe(false);
+  });
+
+  it('recorrência já lançada no mês não conta de novo (sem dupla contagem)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 10));
+    const d = computeDerived(state({
+      // criada hoje com data futura: a 1ª transação já saiu no fluxo do mês
+      txns: [txn({ amount: -99.9, date: '2026-03-28', recId: 'r1' })],
+      recurrences: [{ id: 'r1', desc: 'Internet', cat: 'Assinaturas', icon: '🌐', amount: -99.9, accountId: null, day: 28 }],
+    }));
+    expect(d.hasUpcoming).toBe(false);
+    expect(d.forecastStr).toBe(d.sobrouStr);
   });
 });
 

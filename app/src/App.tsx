@@ -64,7 +64,8 @@ function AppShell() {
 
 function ToastGate() {
   const { state, actions } = useFinance();
-  return <Toast show={state.toast} msg={state.toastMsg} onUndo={state.undoTxn ? actions.undoDelete : null} />;
+  const onUndo = state.undoTxn ? actions.undoDelete : state.undoItem ? actions.undoDeleteItem : null;
+  return <Toast show={state.toast} msg={state.toastMsg} onUndo={onUndo} />;
 }
 
 function Gate() {

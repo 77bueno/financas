@@ -117,6 +117,11 @@ export interface AppState {
   catEditIcon: string;
   /** last deleted transaction, restorable from the toast */
   undoTxn: Txn | null;
+  /** last deleted conta/investimento/cofrinho, restorable from the toast */
+  undoItem: { kind: 'conta'; index: number; item: Account }
+    | { kind: 'investimento'; index: number; item: Investment }
+    | { kind: 'cofrinho'; index: number; item: Goal }
+    | null;
   newCatOpen: boolean;
   newCatName: string;
   newCatIcon: string;

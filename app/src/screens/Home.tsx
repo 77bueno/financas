@@ -147,6 +147,27 @@ export function Home() {
           <div style={{ fontFamily: "'Space Grotesk'", fontSize: 15, color: 'var(--green)', fontWeight: 600, marginTop: 3 }}>{derived.sobrouStr}</div>
         </div>
       </div>
+
+      {/* contas que ainda vêm este mês (recorrências futuras) */}
+      {derived.hasUpcoming && (
+        <div style={{ background: 'var(--w4)', border: '1px solid var(--w7)', borderRadius: 18, padding: 15, display: 'flex', flexDirection: 'column', gap: 11 }}>
+          <strong style={{ fontSize: 14, color: 'var(--t1)', fontWeight: 600 }}>Contas que ainda vêm este mês</strong>
+          {derived.upcomingRecs.map(r => (
+            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--w6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>{r.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: 'var(--t2)' }}>{r.desc}</div>
+                <div style={{ fontSize: 11, color: 'var(--t4)' }}>dia {r.day}</div>
+              </div>
+              <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13, color: r.color, fontWeight: 600 }}>{r.amountStr}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--w7)', paddingTop: 10 }}>
+            <span style={{ fontSize: 12, color: 'var(--t3)' }}>Previsão de sobra no fim do mês</span>
+            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13.5, color: derived.forecastNeg ? 'var(--red)' : 'var(--green)', fontWeight: 600 }}>{derived.forecastNeg ? '- ' : ''}{derived.forecastStr}</span>
+          </div>
+        </div>
+      )}
       </div>
 
       <div className="screen-col">

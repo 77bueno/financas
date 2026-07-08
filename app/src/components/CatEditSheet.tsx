@@ -71,6 +71,26 @@ export function CatEditSheet() {
           ))}
         </div>
 
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, background: 'var(--w4)', border: '1px solid var(--w7)', borderRadius: 12, padding: '10px 12px' }}>
+          <span style={{ fontSize: 12.5, color: 'var(--t3)' }}>Posição nos chips</span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => cat && actions.moveCat(cat.id, -1)}
+              title="Mover pra cima"
+              style={{ width: 32, height: 32, borderRadius: 9, background: 'var(--w6)', border: '1px solid var(--w10)', color: 'var(--t2)', fontSize: 14, cursor: 'pointer' }}
+            >
+              ↑
+            </button>
+            <button
+              onClick={() => cat && actions.moveCat(cat.id, 1)}
+              title="Mover pra baixo"
+              style={{ width: 32, height: 32, borderRadius: 9, background: 'var(--w6)', border: '1px solid var(--w10)', color: 'var(--t2)', fontSize: 14, cursor: 'pointer' }}
+            >
+              ↓
+            </button>
+          </div>
+        </div>
+
         {!isOutros && (
           <p style={{ margin: '0 0 14px', fontSize: 11.5, color: 'var(--t4)', lineHeight: 1.5 }}>
             Renomear atualiza todos os lançamentos e recorrências. Excluir move tudo pra "Outros".

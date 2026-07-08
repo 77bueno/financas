@@ -4,6 +4,23 @@ Registro contínuo de decisões, acertos e erros durante a evolução da platafo
 
 ---
 
+## 2026-07-08 — v9: controle do mês (contas a vir, undo geral, ordem das categorias)
+
+**Pedido:** "bora!" — sequência autônoma do roadmap de organização.
+
+### O que foi construído
+
+- **Contas que ainda vêm este mês** na Início: as recorrências que ainda não venceram aparecem com dia e valor, e um rodapé projeta a **previsão de sobra no fim do mês** (sobra atual ± recorrências pendentes; fica vermelha se a projeção for negativa). É a resposta local (sem servidor de push) pra "me lembra das contas" — o lembrete mora na tela que a pessoa mais abre.
+- **Desfazer exclusão pra tudo**: excluir conta, investimento ou cofrinho agora guarda o item por 5s e o toast ganha "Desfazer", restaurando **na posição original**. Os dois undos (transação e item) são mutuamente exclusivos pra nunca restaurar algo obsoleto.
+- **Reordenar categorias**: setas ↑↓ na folha de edição mudam a posição da categoria nos chips de lançamento e no Perfil.
+
+### O que deu certo / errado
+
+- 🐛 **Bug real pego pelo screenshot, não pelo teste**: uma recorrência criada com data futura lança a 1ª transação na hora — e o card de próximas contas contava a mesma conta **duas vezes** na previsão (a transação já estava no "Saiu" e a recorrência entrava de novo). Corrigido: recorrência com lançamento no mês (via `recId`) sai da lista de pendentes. Ficou teste de regressão cobrindo exatamente esse cenário. Lição: **olhar os números da tela e conferir a aritmética** vale tanto quanto o E2E passar.
+- ✅ E2E: card aparece com recorrência pendente e previsão consistente (4.133,00 − 99,90 = 4.033,10); excluir cofrinho → Desfazer restaura; Transporte movido pra 1ª posição dos chips. 29 testes de unidade no total.
+
+---
+
 ## 2026-07-08 — v8: organização mais profunda (comparação, prazos, CSV, testes)
 
 **Direção do usuário:** o projeto é **organização financeira** — nada de parcelamento/cartão de vendas. Refoquei a rodada em análise e disciplina, com autonomia total ("faça as atualizações que achar pertinentes sem me pedir nada").

@@ -109,6 +109,7 @@ Campos da folha "Nova transação":
 - **Os saldos das contas atualizam automaticamente** — inclusive ao **editar** (o efeito antigo é revertido e o novo aplicado) e ao **excluir** (o efeito é revertido).
 - **Transferência** não conta como gasto por categoria **nem** no Entrou/Saiu do mês — é dinheiro movendo entre contas suas.
 - **"Repetir todo mês"**: marca a transação como recorrente — ela se lança sozinha no mesmo dia (limitado ao dia 28) dos meses seguintes, com débito/crédito na conta. Gerencie/cancele recorrências no Perfil.
+- **Contas que ainda vêm este mês**: a Início mostra as recorrências que ainda não venceram no mês, com dia e valor, e a **previsão de sobra no fim do mês** (sobra atual ± recorrências pendentes). Recorrência já lançada no mês não conta duas vezes.
 - Salvar mostra um toast de confirmação e a transação aparece na Início e no Extrato.
 
 ### 3.3 Categorias personalizadas
@@ -121,7 +122,7 @@ Na folha de transação, com tipo Despesa → **"+ nova categoria"**:
 
 Nomes duplicados (ignorando maiúsculas) não criam categoria nova — apenas selecionam a existente. As 7 categorias padrão: Alimentação, Transporte, Moradia, Lazer, Saúde, Assinaturas, Outros.
 
-**Gerenciar**: no Perfil, cartão **Categorias** — toque numa categoria pra **renomear** (atualiza todos os lançamentos e recorrências), **trocar o emoji** ou **excluir** (lançamentos migram pra "Outros"). "Outros" é protegida contra exclusão/renomeação.
+**Gerenciar**: no Perfil, cartão **Categorias** — toque numa categoria pra **renomear** (atualiza todos os lançamentos e recorrências), **trocar o emoji**, **reordenar** (setas ↑↓ mudam a posição nos chips) ou **excluir** (lançamentos migram pra "Outros"). "Outros" é protegida contra exclusão/renomeação.
 
 ### 3.4 Extrato
 
@@ -156,6 +157,7 @@ Aba **Metas**.
 
 - Card-resumo com **total guardado** vs. total das metas.
 - Cada cofrinho mostra progresso (% e barra). **Tocar** abre a edição: nome, **"guardado até agora"** (é assim que se registra um aporte), meta a atingir, **prazo** ou **Excluir**.
+- **Excluir tem "Desfazer"**: como nas transações, excluir uma conta, investimento ou cofrinho mostra um toast com **Desfazer** por 5 segundos — restaura o item na posição original.
 - **+ Criar novo cofrinho**: nome + meta a atingir + **prazo opcional** (mês/ano).
 - **Ritmo mensal**: com prazo definido, o card mostra **"Guarde R$ X/mês até <mês>"** (o que falta dividido pelos meses restantes, incluindo o atual). Prazo vencido com meta incompleta fica vermelho; meta atingida vira "Meta atingida 🎉".
 

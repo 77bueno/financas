@@ -37,6 +37,7 @@ function loadInitial(userId: string, accountName: string): AppState {
         budgetCat: null,
         catEditId: null,
         undoTxn: null,
+        undoItem: null,
         newCatOpen: false,
         editKind: null,
         editId: null,
@@ -244,7 +245,7 @@ function useFinanceState(userId: string, accountName: string) {
     setState(p => {
       const t = p.txns.find(x => x.id === id);
       const accounts = t ? applyTxnToAccounts(p.accounts, t, -1) : p.accounts;
-      return { ...p, accounts, txns: p.txns.filter(x => x.id !== id), addOpen: false, addEditId: null, undoTxn: t ?? null, toast: true, toastMsg: '✓ Transação excluída' };
+      return { ...p, accounts, txns: p.txns.filter(x => x.id !== id), addOpen: false, addEditId: null, undoTxn: t ?? null, undoItem: null, toast: true, toastMsg: '✓ Transação excluída' };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false, undoTxn: null })), 5000);
@@ -422,13 +423,52 @@ function useFinanceState(userId: string, accountName: string) {
       const { editKind: kind, editId: id } = p;
       if (!kind || !id) return p;
       let next: Partial<AppState> = {};
-      if (kind === 'conta') next = { accounts: p.accounts.filter(a => a.id !== id) };
-      else if (kind === 'investimento') next = { investments: p.investments.filter(iv => iv.id !== id) };
-      else next = { goals: p.goals.filter(g => g.id !== id) };
-      return { ...p, ...next, editKind: null, editId: null, toast: true, toastMsg: '✓ Excluído' };
+      let undoItem: AppState['undoItem'] = null;
+      if (kind === 'conta') {
+        const index = p.accounts.findIndex(a => a.id === id);
+        if (index >= 0) undoItem = { kind, index, item: p.accounts[index] };
+        next = { accounts: p.accounts.filter(a => a.id !== id) };
+      } else if (kind === 'investimento') {
+        const index = p.investments.findIndex(iv => iv.id === id);
+        if (index >= 0) undoItem = { kind, index, item: p.investments[index] };
+        next = { investments: p.investments.filter(iv => iv.id !== id) };
+      } else {
+        const index = p.goals.findIndex(g => g.id === id);
+        if (index >= 0) undoItem = { kind: 'cofrinho', index, item: p.goals[index] };
+        next = { goals: p.goals.filter(g => g.id !== id) };
+      }
+      return { ...p, ...next, editKind: null, editId: null, undoItem, undoTxn: null, toast: true, toastMsg: '✓ Excluído' };
+    });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false, undoItem: null })), 5000);
+  }, []);
+
+  /** Restores the last deleted conta/investimento/cofrinho at its original position. */
+  const undoDeleteItem = useCallback(() => {
+    setState(p => {
+      const u = p.undoItem;
+      if (!u) return p;
+      const insert = <T,>(list: T[], index: number, item: T): T[] => [...list.slice(0, index), item, ...list.slice(index)];
+      const next: Partial<AppState> =
+        u.kind === 'conta' ? { accounts: insert(p.accounts, u.index, u.item) }
+        : u.kind === 'investimento' ? { investments: insert(p.investments, u.index, u.item) }
+        : { goals: insert(p.goals, u.index, u.item) };
+      return { ...p, ...next, undoItem: null, toast: true, toastMsg: '↩ Restaurado' };
     });
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setState(p => ({ ...p, toast: false })), 1800);
+  }, []);
+
+  /** Moves a category one position up/down in the chips order. */
+  const moveCat = useCallback((id: string, dir: -1 | 1) => {
+    setState(p => {
+      const i = p.categories.findIndex(c => c.id === id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= p.categories.length) return p;
+      const categories = [...p.categories];
+      [categories[i], categories[j]] = [categories[j], categories[i]];
+      return { ...p, categories };
+    });
   }, []);
 
   const toggleAddRecurring = useCallback(() => setState(p => ({ ...p, addRecurring: !p.addRecurring })), []);
@@ -642,6 +682,7 @@ function useFinanceState(userId: string, accountName: string) {
     setEditDeadline,
     saveEdit,
     deleteEdit,
+    undoDeleteItem,
     undoDelete,
     openCatEdit,
     closeCatEdit,
@@ -649,6 +690,7 @@ function useFinanceState(userId: string, accountName: string) {
     setCatEditIcon,
     saveCatEdit,
     deleteCat,
+    moveCat,
     toggleAddRecurring,
     deleteRecurrence,
     setSpendMonth,
@@ -672,7 +714,7 @@ function useFinanceState(userId: string, accountName: string) {
       startManual, loadDemo, onbNext, onbBack, finishOnb, addAccount, updateAccount, removeAccount,
       openHub, closeHub, openQuick, closeQuick, setQuickCents, setQuickName, setQuickGroup, setQuickDeadline, saveQuick,
       openEditItem, closeEdit, setEditName, setEditCents, setEditCents2, setEditGroup, setEditDeadline, saveEdit, deleteEdit,
-      undoDelete, openCatEdit, closeCatEdit, setCatEditName, setCatEditIcon, saveCatEdit, deleteCat,
+      undoDelete, undoDeleteItem, openCatEdit, closeCatEdit, setCatEditName, setCatEditIcon, saveCatEdit, deleteCat, moveCat,
       toggleAddRecurring, deleteRecurrence, setSpendMonth, openBudget, closeBudget, setBudgetCents, saveBudget,
       exportData, exportCsv, importData, resetAll, setInvestPct, setAddType, setAddCat, openAdd, closeAdd, addTxn, flashToast]);
 

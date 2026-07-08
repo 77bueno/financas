@@ -38,6 +38,26 @@ export function computeDerived(state: AppState) {
   const saiu = flowTxns.filter(t => t.amount < 0).reduce((a, b) => a + Math.abs(b.amount), 0);
   const sobrou = entrou - saiu;
 
+  // bills still to come this month: recurrences whose day hasn't arrived AND
+  // that haven't posted a transaction this month (a recurrence created with a
+  // future date posts its first txn immediately — counting it again would
+  // double it in the forecast)
+  const todayDay = now.getDate();
+  const upcoming = state.recurrences.filter(r =>
+    r.day > todayDay && !state.txns.some(t => t.recId === r.id && t.date.startsWith(currentYM)));
+  const upcomingRecs = [...upcoming]
+    .sort((a, b) => a.day - b.day)
+    .map(r => ({
+      id: r.id,
+      desc: r.desc,
+      icon: r.icon,
+      day: r.day,
+      amountStr: (r.amount < 0 ? '- ' : '+ ') + fmt(r.amount),
+      color: r.amount < 0 ? 'var(--red)' : 'var(--green)',
+    }));
+  const upcomingNet = upcoming.reduce((a, r) => a + r.amount, 0);
+  const forecast = sobrou + upcomingNet;
+
   // spending by category this month (transfers between accounts don't count)
   const catTotals = new Map<string, number>();
   for (const t of monthTxns) {
@@ -201,6 +221,10 @@ export function computeDerived(state: AppState) {
     saiuStr: fmt(saiu),
     sobrouStr: fmt(sobrou),
     hasTxns: state.txns.length > 0,
+    upcomingRecs,
+    hasUpcoming: upcomingRecs.length > 0,
+    forecastStr: fmt(forecast),
+    forecastNeg: forecast < 0,
 
     // spending
     spendCats: spendCatRows,
